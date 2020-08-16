@@ -1,0 +1,50 @@
+{% load wagtailimages_tags wagtailadmin_tags %}
+{% load i18n %}
+{% trans "Orders Line Stock" as ins_emb_str %}
+{% include "wagtailadmin/shared/header.html" with title=ins_emb_str merged=1 %}
+
+<div class="tab-content">
+  <section class="active nice-padding">
+  <form id="allocation-form"
+        method="post"
+        action="{% url 'warehouse:product_stock_modal_workflow' line_item.guid  %}">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <table class="listing chooser">
+      <thead>
+          <tr>
+            <th>{% trans 'Warehouse' %}</th>
+            <th>{% trans 'Quantity' %}</th>
+          </tr>
+      </thead>
+      <tbody>
+        
+          {% for form in formset %}
+            {{ form.non_field_errors }}
+            {% for hidden_field in form.hidden_fields %}
+              {{ hidden_field.errors }}
+              {{ hidden_field }}
+            {% endfor %}
+            <tr>
+              {% for field in form.visible_fields %}
+                <td>
+                  {{ field.errors }}
+                  {{ field }}
+                  {{ field.help_text }}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          <button type="submit" class="button button-longrunning">
+            <svg class="icon icon-spinner icon" 
+                 aria-hidden="true" 
+                 focusable="false">
+              <use href="#icon-spinner"></use>
+            </svg>
+            {% trans 'Allocate' %}
+          </button>
+      </tbody>
+    </table>
+    </form>
+  </section>
+</div>

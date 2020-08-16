@@ -1,7 +1,7 @@
-Platform
+assistant
 ========
 
-Harumio Platform
+Harumio assistant
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
      :target: https://github.com/pydanny/cookiecutter-django/
@@ -42,7 +42,7 @@ Running type checks with mypy:
 
 ::
 
-  $ mypy platform
+  $ mypy assistant
 
 Test coverage
 ^^^^^^^^^^^^^
@@ -78,7 +78,7 @@ To run a celery worker:
 
 .. code-block:: bash
 
-    cd platform
+    cd assistant
     celery -A config.celery_app worker -l info
 
 Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.

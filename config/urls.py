@@ -7,37 +7,49 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
 
+from wagtail.core import urls as wagtail_urls
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.documents import urls as wagtaildocs_urls
+
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
-    path("users/", include("platform.users.urls", namespace="users")),
+    path("users/", include("assistant.users.urls", namespace="users")),
     path('ht/', include('health_check.urls')),
     path("accounts/", include("allauth.urls")),
     # Wagtail Admin
     path('cms/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     # Your stuff: custom urls includes go here
-   
+    path(
+        'products/', include("assistant.products.urls", namespace="products")
+    ),
+    path(
+        'warehouse/',
+        include("assistant.warehouse.urls", namespace="warehouse"),
+    ),
+    path("api/", include("config.api_router")),
+    path("auth-token/", obtain_auth_token),
     # Wagtail CMS
-    path('', include(wagtail_urls)),
+    # path('', include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development
     urlpatterns += staticfiles_urlpatterns()
 
 # API URLS
-urlpatterns += [
-    # API base url
-    path("api/", include("config.api_router")),
-    # DRF auth token
-    path("auth-token/", obtain_auth_token),
-]
+# urlpatterns += [
+#     # API base url
+#     path("api/", include("config.api_router")),
+#     # DRF auth token
+#     path("auth-token/", obtain_auth_token),
+#     # Wagtail CMS
+#     path('', include(wagtail_urls)),
+# ]
 
 if settings.USE_SILK:
-    urlpatterns += [
-        path('silk/', include('silk.urls', namespace='silk'))
-    ]
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
@@ -63,4 +75,6 @@ if settings.DEBUG:
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls))
+        ] + urlpatterns

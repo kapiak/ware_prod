@@ -1,0 +1,34 @@
+{% load wagtailimages_tags wagtailadmin_tags %}
+{% load i18n %}
+{% trans "Orders Lines" as ins_emb_str %}
+{% include "wagtailadmin/shared/header.html" with title=ins_emb_str merged=1 %}
+
+<div class="tab-content">
+  <section class="active nice-padding">
+    <table class="listing chooser">
+      <thead>
+          <tr>
+            <th>{% trans 'Order' %}</th>
+            <th>{% trans 'Quantity' %}</th>
+            <th>{% trans 'UnFulfilled' %}</th>
+            <th>{% trans 'Allocated' %}</th>
+            <th>{% trans 'Requires' %}</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for line_item in line_items_page.object_list %}
+        <tr class="choose-line"
+            data-url="{% url 'warehouse:product_stock_modal_workflow' line_item.guid %}">
+          <td class="title">
+            <h2>{{ line_item.order.number }}</h2>
+          </td>
+          <td>{{ line_item.quantity }}</td>
+          <td>{{ line_item.quantity_unfulfilled }}</td>
+          <td>{{ line_item.allocated.allocated }}</td>
+          <td>{{ line_item.requires }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>

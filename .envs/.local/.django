@@ -2,6 +2,7 @@
 # ------------------------------------------------------------------------------
 USE_DOCKER=yes
 IPYTHONDIR=/app/.ipython
+DJANGO_DEBUG=true
 
 # Redis
 # ------------------------------------------------------------------------------
@@ -14,3 +15,26 @@ CELERY_BROKER_URL=amqp://debug:debug@broker:5672
 # Flower
 CELERY_FLOWER_USER=debug
 CELERY_FLOWER_PASSWORD=debug
+
+# RABBITMQ
+RABBITMQ_HOST=broker
+RABBITMQ_PORT=5672
+RABBITMQ_USER=debug
+RABBITMQ_PASSWORD=debug
+
+# Shopify
+#SHOPIFY_API_KEY=9a245dfa3097e067bbaff562a43be022
+#SHOPIFY_PASSWORD=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
+#SHOPIFY_SHARED_SECRET=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
+#SHOPIFY_EXAMPLE_URL=https://9a245dfa3097e067bbaff562a43be022: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@basselxyz.myshopify.com/admin/api/2020-07/orders.json
+#SHOPIFY_API_VERSION=2020-07
+#SHOPIFY_STORE_NAME=basselxyz
+#SHOPIFY_STORE_URL=https://basselxyz.myshopify.com/
+
+SHOPIFY_API_KEY=26c588c35e306c7f16912f52bea8ffbf
+SHOPIFY_PASSWORD=eec1661319c241850ea87736d0dbec30
+SHOPIFY_SHARED_SECRET=eec1661319c241850ea87736d0dbec30
+SHOPIFY_EXAMPLE_URL=https://9a245dfa3097e067bbaff562a43be022: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@basselxyz.myshopify.com/admin/api/2020-07/orders.json
+SHOPIFY_API_VERSION=2020-07
+SHOPIFY_STORE_NAME=harumio
+SHOPIFY_STORE_URL=https://harumio.myshopify.com/

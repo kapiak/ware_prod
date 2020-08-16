@@ -24,8 +24,8 @@ if __name__ == "__main__":
         raise
 
     # This allows easy placement of apps within the interior
-    # platform directory.
+    # assistant directory.
     current_path = Path(__file__).parent.resolve()
-    sys.path.append(str(current_path / "platform"))
+    sys.path.append(str(current_path / "assistant"))
 
     execute_from_command_line(sys.argv)

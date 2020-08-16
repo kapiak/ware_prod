@@ -1,0 +1,41 @@
+{% load wagtailimages_tags wagtailadmin_tags %}
+{% load i18n %}
+{% trans "Orders List" as ins_emb_str %}
+{% include "wagtailadmin/shared/header.html" with title=ins_emb_str merged=1 %}
+
+<div class="tab-content">
+  <section class="active nice-padding">
+    {% for order in page.object_list %}
+    <button class="button button-secondary">
+      #{{ order.number }} - {{ order.status }}
+    </button>
+    {% endfor %}
+    <nav class="pagination" aria-label="{% trans 'Pagination' %}">
+      <p>
+        {% blocktrans with page_number=page.number num_pages=paginator.num_pages %}
+        Page {{ page_number }} of {{ num_pages }}.
+        {% endblocktrans %}
+      </p>
+      <ul>
+        <li class="prev">
+          {% if page.has_previous %}
+          <a href="{% url 'products:product_orders_modal_workflow' product_guid %}"
+             data-page="{{ page.previous_page_number }}"
+             class="icon icon-arrow-left paginate">
+            {% trans "Previous" %}
+          </a>
+          {% endif %}
+        </li>
+        <li class="next">
+          {% if page.has_next %}
+          <a href="{% url 'products:product_orders_modal_workflow' product_guid %}"
+             data-page="{{ page.next_page_number }}"
+             class="icon icon-arrow-right-after paginate">
+            {% trans "Next" %}
+          </a>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+  </section>
+</div>

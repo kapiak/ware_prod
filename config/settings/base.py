@@ -6,8 +6,8 @@ from pathlib import Path
 import environ
 
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-# platform/
-APPS_DIR = ROOT_DIR / "platform"
+# assistant/
+APPS_DIR = ROOT_DIR / "assistant"
 env = environ.Env()
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
@@ -20,7 +20,7 @@ if READ_DOT_ENV_FILE:
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool("DJANGO_DEBUG", False)
 
-USE_SILK = env.bool('USE_SILK', default=False)
+USE_SILK = env.bool("USE_SILK", default=False)
 
 # Local time zone. Choices are
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -67,20 +67,23 @@ DJANGO_APPS = [
     "django.forms",
 ]
 WAGTAIL_APPS = [
-    'wagtail.contrib.forms',
-    'wagtail.contrib.redirects',
-    'wagtail.embeds',
-    'wagtail.sites',
-    'wagtail.users',
-    'wagtail.snippets',
-    'wagtail.documents',
-    'wagtail.images',
-    'wagtail.search',
-    'wagtail.admin',
-    'wagtail.core',
-
-    'modelcluster',
-    'taggit',
+    "wagtail.contrib.modeladmin",
+    "wagtail.contrib.table_block",
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.contrib.postgres_search",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail.core",
+    "modelcluster",
+    "taggit",
+    "wagtail.contrib.styleguide",
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -93,33 +96,39 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "flags",
     "djmoney",
-    "health_check",                             # required
-    "health_check.db",                          # stock Django health checkers
+    # "django_countries",
+    "health_check",  # required
+    "health_check.db",  # stock Django health checkers
     "health_check.cache",
     "health_check.storage",
-    "health_check.contrib.celery",              # requires celery
+    "health_check.contrib.celery",  # requires celery
     # "health_check.contrib.psutil",              # disk and memory utilization; requires psutil
-    "health_check.contrib.s3boto3_storage",     # requires boto3 and S3BotoStorage backend
-    "health_check.contrib.rabbitmq",            # requires RabbitMQ broker
-    "health_check.contrib.redis",               # required Redis broker
+    "health_check.contrib.s3boto3_storage",  # requires boto3 and S3BotoStorage backend
+    "health_check.contrib.rabbitmq",  # requires RabbitMQ broker
+    "health_check.contrib.redis",  # required Redis broker
 ]
 
 LOCAL_APPS = [
-    "platform.core.apps.CoreConfig",
-    "platform.users.apps.UsersConfig",
+    "assistant.core.apps.CoreConfig",
+    "assistant.users.apps.UsersConfig",
+    "assistant.addresses.apps.AddressesConfig",
+    "assistant.products.apps.ProductsConfig",
+    "assistant.orders.apps.OrdersConfig",
+    "assistant.warehouse.apps.WarehouseConfig",
     # Your stuff: custom apps go here
+    "assistant.shopify_sync.apps.ShopifySyncConfig",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + WAGTAIL_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 if USE_SILK:
-    INSTALLED_APPS.append('silk')
+    INSTALLED_APPS.append("silk")
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
-MIGRATION_MODULES = {"sites": "platform.contrib.sites.migrations"}
+MIGRATION_MODULES = {"sites": "assistant.contrib.sites.migrations"}
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
@@ -151,8 +160,12 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
+    },
 ]
 
 # MIDDLEWARE
@@ -175,8 +188,17 @@ MIDDLEWARE = [
 
 # Wagtail
 # ------------------------------------------------------------------------------
-WAGTAIL_SITE_NAME = 'Harumio Platform'
-WAGTAILADMIN_NOTIFICATION_FROM_EMAIL = 'admin@harum.io'
+WAGTAIL_SITE_NAME = "Harumio assistant"
+WAGTAILADMIN_NOTIFICATION_FROM_EMAIL = "admin@harum.io"
+WAGTAILADMIN_NOTIFICATION_USE_HTML = True
+WAGTAILSEARCH_HITS_MAX_AGE = 14
+WAGTAILSEARCH_BACKENDS = {
+    "default": {
+        "BACKEND": "wagtail.contrib.postgres_search.backend",
+        "SEARCH_CONFIG": "english",
+        "ATOMIC_REBUILD": True,
+    },
+}
 
 # STATIC
 # ------------------------------------------------------------------------------
@@ -225,7 +247,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "platform.utils.context_processors.settings_context",
+                "assistant.utils.context_processors.settings_context",
             ],
         },
     }
@@ -257,7 +279,8 @@ X_FRAME_OPTIONS = "DENY"
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = env(
-    "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+    "DJANGO_EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
 EMAIL_TIMEOUT = 5
@@ -287,12 +310,35 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         }
     },
     "root": {"level": "INFO", "handlers": ["console"]},
+    "loggers": {
+        "": {"handlers": ["console"], "level": "INFO", "propagate": True,},
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
 }
 
 # Celery
@@ -318,9 +364,17 @@ CELERY_TASK_TIME_LIMIT = 5 * 60
 CELERY_TASK_SOFT_TIME_LIMIT = 60
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+RABBITMQ_HOST = env("RABBITMQ_HOST")
+RABBITMQ_PORT = env("RABBITMQ_PORT")
+RABBITMQ_USER = env("RABBITMQ_USER")
+RABBITMQ_PASSWORD = env("RABBITMQ_PASSWORD")
+
 # django-allauth
 # ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+ACCOUNT_ALLOW_REGISTRATION = env.bool(
+    "DJANGO_ACCOUNT_ALLOW_REGISTRATION", True
+)
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -328,9 +382,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = "platform.users.adapters.AccountAdapter"
+ACCOUNT_ADAPTER = "assistant.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = "platform.users.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "assistant.users.adapters.SocialAccountAdapter"
 
 # django-rest-framework
 # -------------------------------------------------------------------------------
@@ -340,10 +394,25 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+DEFAULT_MAX_DIGITS = 20
+DEFAULT_DECIMAL_PLACES = 4
+DEFAULT_CURRENCY = "USD"
+
+
+SHOPIFY_API_KEY = env("SHOPIFY_API_KEY")
+SHOPIFY_PASSWORD = env("SHOPIFY_PASSWORD")
+# SHOPIFY_SHARED_SECRET = env('SHOPFIY_SHARED_SECRET')
+SHOPIFY_STORE_URL = env("SHOPIFY_STORE_URL")
+SHOPIFY_API_VERSION = env("SHOPIFY_API_VERSION")
+SHOPIFY_EXAMPLE_URL = env("SHOPIFY_EXAMPLE_URL")
+SHOPIFY_STORE_NAME = env("SHOPIFY_STORE_NAME")

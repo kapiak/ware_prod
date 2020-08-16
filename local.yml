@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: platform_local_django
+    image: assistant_local_django
     container_name: django
     depends_on:
       - postgres
@@ -27,7 +27,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: platform_production_postgres
+    image: assistant_production_postgres
     container_name: postgres
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
@@ -35,21 +35,21 @@ services:
     env_file:
       - ./.envs/.local/.postgres
 
-  docs:
-    image: platform_local_docs
-    container_name: docs
-    build:
-      context: .
-      dockerfile: ./compose/local/docs/Dockerfile
-    env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
-    volumes:
-      - ./docs:/docs
-      - ./config:/app/config
-      - ./platform:/app/platform
-    ports:
-      - "7000:7000"
+  # docs:
+  #   image: assistant_local_docs
+  #   container_name: docs
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/docs/Dockerfile
+  #   env_file:
+  #     - ./.envs/.local/.django
+  #     - ./.envs/.local/.postgres
+  #   volumes:
+  #     - ./docs:/docs
+  #     - ./config:/app/config
+  #     - ./assistant:/app/assistant
+  #   ports:
+  #     - "7000:7000"
 
   mailhog:
     image: mailhog/mailhog:v1.0.0
@@ -69,10 +69,11 @@ services:
       - RABBITMQ_DEFAULT_PASS=debug
     ports:
       - "5672:5672"
+      - "15672:15672"
 
   celeryworker:
     <<: *django
-    image: platform_local_celeryworker
+    image: assistant_local_celeryworker
     container_name: celeryworker
     depends_on:
       - broker
@@ -84,7 +85,7 @@ services:
 
   celerybeat:
     <<: *django
-    image: platform_local_celerybeat
+    image: assistant_local_celerybeat
     container_name: celerybeat
     depends_on:
       - broker
@@ -96,7 +97,7 @@ services:
 
   flower:
     <<: *django
-    image: platform_local_flower
+    image: assistant_local_flower
     container_name: flower
     ports:
       - "5555:5555"

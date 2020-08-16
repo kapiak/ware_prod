@@ -23,7 +23,7 @@ django.setup()
 
 # -- Project information -----------------------------------------------------
 
-project = "Platform"
+project = "assistant"
 copyright = """2020, Bassel J. Hamadeh"""
 author = "Bassel J. Hamadeh"
 

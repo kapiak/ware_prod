@@ -1,0 +1,73 @@
+{% extends 'wagtailadmin/base.html' %}
+{% load i18n %}
+
+{% block extra_css %}
+<style>
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
+}
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="breadcrumbs">
+  <ul class="breadcrumb">
+      <li class="home">
+        <a href="#" class="icon icon-home text-replace">{% trans 'Products' %}</a>
+      </li>
+      <li><a href="#">{{ object.name }}</a></li>
+  </ul>
+</section>
+<header class="merged tab-merged">
+    <div class="row nice-padding">
+        <div class="left">
+            <div class="col header-title">
+                <h1>
+                  {% trans 'Product' %}
+                </h1>
+            </div>
+
+        </div>
+        <div class="right">
+
+        </div>
+    </div>
+</header>
+<ul class="tab-nav merged" role="tablist">
+  <li class=" active" role="tab" aria-controls="tab-details">
+    <a href="#tab-details" class="active">{% trans 'Details' %}</a>
+  </li>
+  <li class=" " role="tab" aria-controls="tab-variants">
+    <a href="#tab-variants" class="">{% trans 'Variants' %}</a>
+  </li> 
+  <li class=" " role="tab" aria-controls="tab-orders">
+    <a href="#tab-orders" class="">{% trans 'Related Orders' %}</a>
+  </li>
+</ul>
+<div class="tab-content">
+
+  <section id="tab-details" class="active" role="tabpanel" aria-labelledby="tab-label-details">
+     <div class="row">
+      <div class="column nice-padding">Hello</div>
+      <div class="column nice-padding">Hello</div>
+    </div> 
+  </section>
+
+  <section id="tab-variants" class="" role="tabpanel" aria-labelledby="tab-label-variants">
+    Tab Variants
+  </section>
+
+  <section id="tab-orders" class="" role="tabpanel" aria-labelledby="tab-label-orders">
+    Tab Orders
+  </section>
+</div>
+{% endblock content %}

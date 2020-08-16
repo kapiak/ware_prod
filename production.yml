@@ -10,7 +10,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-    image: platform_production_django
+    image: assistant_production_django
     depends_on:
       - postgres
       - redis
@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: platform_production_postgres
+    image: assistant_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data
       - production_postgres_data_backups:/backups
@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/traefik/Dockerfile
-    image: platform_production_traefik
+    image: assistant_production_traefik
     depends_on:
       - django
     volumes:
@@ -49,17 +49,17 @@ services:
 
   celeryworker:
     <<: *django
-    image: platform_production_celeryworker
+    image: assistant_production_celeryworker
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
-    image: platform_production_celerybeat
+    image: assistant_production_celerybeat
     command: /start-celerybeat
 
   flower:
     <<: *django
-    image: platform_production_flower
+    image: assistant_production_flower
     command: /start-flower
 
   

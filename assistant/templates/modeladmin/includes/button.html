@@ -1,0 +1,8 @@
+<a{% if button.url %} href="{{ button.url }}"{% endif %}
+  class="{{ button.classname }}"
+  title="{{ button.title }}"
+  {% if button.target %}
+  target="{{ button.target }}"{% endif %}
+  {% if button.rel %} rel="{{ button.rel }}"{% endif %}
+  {% if button.id %} id={{ button.id }} {% endif %}
+>{{ button.label }}</a>

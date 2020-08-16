@@ -11,6 +11,12 @@ flower==0.9.5  # https://github.com/mher/flower
 uvicorn==0.11.8  # https://github.com/encode/uvicorn
 pydantic==1.6.1  # https://github.com/samuelcolvin/pydantic
 measurement==3.2.0  # https://github.com/coddingtonbear/python-measurement
+pika==1.1.0  # https://github.com/pika/pika
+
+
+# Shopify
+# ------------------------------------------------------------------------------
+ShopifyAPI==8.0.1
 
 # Django
 # ------------------------------------------------------------------------------
@@ -24,10 +30,14 @@ django-silk==4.1.0  # https://github.com/jazzband/django-silk
 django-health-check==3.12.1  # https://github.com/KristianOellegaard/django-health-check
 django-flags==5.0.0  # https://github.com/cfpb/django-flags
 django-money==1.1  # https://github.com/django-money/django-money
+django-measurement==3.2.3  # https://github.com/coddingtonbear/django-measurement
+django-countries==6.1.2  # https://github.com/SmileyChris/django-countries/
+django-phonenumber-field[phonenumbers]==4.0.0  # https://github.com/stefanfoulis/django-phonenumber-field
+django-versatileimagefield==2.0  # https://github.com/respondcreate/django-versatileimagefield
 
 # Django REST Framework
 djangorestframework==3.11.1  # https://github.com/encode/django-rest-framework
 django-cors-headers==3.4.0 # https://github.com/adamchainz/django-cors-headers
 
 # Wagtail
-wagtail==2.9.3  # https://github.com/wagtail/wagtail/
+wagtail==2.10  # https://github.com/wagtail/wagtail/

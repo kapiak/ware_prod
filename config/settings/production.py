@@ -15,7 +15,7 @@ from .base import env
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["platform.harum.io"])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["assistant.harum.io"])
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ aws_s3_domain = AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # MEDIA
 # ------------------------------------------------------------------------------
-DEFAULT_FILE_STORAGE = "platform.utils.storages.MediaRootS3Boto3Storage"
+DEFAULT_FILE_STORAGE = "assistant.utils.storages.MediaRootS3Boto3Storage"
 MEDIA_URL = f"https://{aws_s3_domain}/media/"
 
 # TEMPLATES
@@ -113,13 +113,13 @@ TEMPLATES[-1]["OPTIONS"]["loaders"] = [  # type: ignore[index] # noqa F405
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL", default="Platform <noreply@platform.harum.io>"
+    "DJANGO_DEFAULT_FROM_EMAIL", default="assistant <noreply@assistant.harum.io>"
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
 EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[Platform]"
+    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[assistant]"
 )
 
 # ADMIN
