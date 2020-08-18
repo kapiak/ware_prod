@@ -14,11 +14,21 @@ from pika import (
     ConnectionParameters,
 )
 from pika.adapters.blocking_connection import BlockingChannel
-from pika.exceptions import AMQPConnectionError, AMQPChannelError, StreamLostError, ChannelClosedByBroker
+from pika.exceptions import (
+    AMQPConnectionError,
+    AMQPChannelError,
+    StreamLostError,
+    ChannelClosedByBroker,
+)
 from pika.spec import PERSISTENT_DELIVERY_MODE
 from threading import Thread
 
-CONNECTION_ERRORS = (AMQPConnectionError, ConnectionResetError, StreamLostError, ChannelClosedByBroker)
+CONNECTION_ERRORS = (
+    AMQPConnectionError,
+    ConnectionResetError,
+    StreamLostError,
+    ChannelClosedByBroker,
+)
 CHANNEL_ERROR = AMQPChannelError
 
 logger = logging.getLogger(__name__)
@@ -30,7 +40,9 @@ class Publisher(object):
     queue declares and bindings plus retry logic built for its connection and publishing.
     """
 
-    def __init__(self, exchange_name: str, queue_name: str, routing_key: str, **kwargs):
+    def __init__(
+        self, exchange_name: str, queue_name: str, routing_key: str, **kwargs
+    ):
         """
         :param exchange_name: Your exchange name.
         :param queue_name: Your queue name.
@@ -247,7 +259,7 @@ class Consumer(object):
 
     def start(self):
         self.connect()
-        
+
         self.thread = Thread(target=self.consume)
         self.thread.setDaemon(True)
         self.thread.start()

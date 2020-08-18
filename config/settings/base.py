@@ -96,6 +96,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "flags",
     "djmoney",
+    "sequences.apps.SequencesConfig",
     # "django_countries",
     "health_check",  # required
     "health_check.db",  # stock Django health checkers
@@ -111,10 +112,12 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "assistant.core.apps.CoreConfig",
     "assistant.users.apps.UsersConfig",
+    "assistant.pages.apps.PagesConfig",
     "assistant.addresses.apps.AddressesConfig",
     "assistant.products.apps.ProductsConfig",
     "assistant.orders.apps.OrdersConfig",
     "assistant.warehouse.apps.WarehouseConfig",
+    "assistant.weblink_channel.apps.WeblinkChannelConfig",
     # Your stuff: custom apps go here
     "assistant.shopify_sync.apps.ShopifySyncConfig",
 ]
@@ -184,6 +187,7 @@ MIDDLEWARE = [
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "assistant.core.middlewares.ip_address_middleware",
 ]
 
 # Wagtail

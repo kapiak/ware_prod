@@ -1,0 +1,31 @@
+{% load wagtailcore_tags %}
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="{{ page.title }}">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="{% pageurl page %}">
+  <meta property="og:image" content="">
+
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+
+</head>
+<body{% block body_class%}{% endblock body_class %}>
+  <div class="container mx-auto px-4">
+  {% include 'pages/includes/header.html' %}
+  {% block body %}{% endblock body %}
+  </div>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  {% block vue_app %}{% endblock vue_app %}
+</body>
+</html>

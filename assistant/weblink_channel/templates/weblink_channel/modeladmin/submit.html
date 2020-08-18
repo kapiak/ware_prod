@@ -1,0 +1,95 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n modeladmin_tags wagtailadmin_tags %}
+
+{% block titletag %}{{ view.get_meta_title }}{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    {{ view.media.css }}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ view.media.js }}
+{% endblock %}
+
+{% block content %}
+    {% block header %}
+        <header class="nice-padding hasform">
+            <div class="row header-title">
+                <div class="left">
+                    <div class="col">
+                        {% block h1 %}
+                        <h1 {% if view.header_icon %}
+                            class="icon icon-{{ view.header_icon }}"{% endif %}>
+                          {{ view.get_page_title }} - {{ instance.number }}
+                        </h1>
+                        {% endblock %}
+                    </div>
+                </div>
+                {% block header_extra %}
+                    <div class="right">
+                        {% if user_can_create %}
+                            <div class="actionbutton">
+                                {% include 'modeladmin/includes/button.html' with button=view.button_helper.add_button %}
+                            </div>
+                        {% endif %}
+                        {% if view.list_export %}
+                            <div class="dropdown dropdown-button match-width col">
+                                <a href="?export=xlsx&{{ request.GET.urlencode }}" class="button bicolor button--icon">{% icon name="download" wrapped=1 %}{% trans 'Download XLSX' %}</a>
+                                <div class="dropdown-toggle">{% icon name="arrow-down" %}</div>
+                                <ul>
+                                    <li><a  class="button bicolor button--icon" href="?export=csv&{{ request.GET.urlencode }}">{% icon name="download" wrapped=1 %}{% trans 'Download CSV' %}</a></li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+        </header>
+    {% endblock %}
+
+    {% block content_main %}
+    <div>
+      <div class="row">
+        <div class="result-list col12">
+          <table class="listing full-width">
+            <thead>
+              <tr>
+                <th>{% trans 'Item' %}</th>
+                <th>{% trans 'Status' %}</th>
+                <th>{% trans 'quantity' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in instance.items.all %}
+              <tr class="{% cycle 'odd' 'even' %}">
+                <td class="title">
+                  <h2><a href="">{{ item.sales_order_item.name }} </a></h2>
+                  <ul class="actions">
+                    <li>
+                      <a href="#"
+                         class="button button-small button-secondary" 
+                         title="Mark Recieved">Mark Recieved
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#"
+                          class="button no button-small button-secondary" 
+                          title="Mark Unrecieved">Not Recieved
+                      </a>
+                    </li>
+                </ul>
+              </td>
+              <td>{{ item.sales_order_item.status }}</td>
+              <td>{{ item.quantity }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+
+{% endblock %}

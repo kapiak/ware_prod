@@ -29,6 +29,10 @@ urlpatterns = [
         'warehouse/',
         include("assistant.warehouse.urls", namespace="warehouse"),
     ),
+    path(
+        'weblink-channel/',
+        include("assistant.weblink_channel.urls", namespace="weblink_channel"),
+    ),
     path("api/", include("config.api_router")),
     path("auth-token/", obtain_auth_token),
     # Wagtail CMS

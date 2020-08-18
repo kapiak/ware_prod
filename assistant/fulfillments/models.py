@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -14,7 +16,10 @@ logger = logging.getLogger(__name__)
 class Fulfillment(index.Indexed, BaseModel, ClusterableModel):
     fulfillment_order = models.PositiveIntegerField(editable=False)
     order = models.ForeignKey(
-        Order, related_name="fulfillments", editable=False, on_delete=models.CASCADE
+        Order,
+        related_name="fulfillments",
+        editable=False,
+        on_delete=models.CASCADE,
     )
     status = models.CharField(
         max_length=32,
@@ -40,7 +45,9 @@ class Fulfillment(index.Indexed, BaseModel, ClusterableModel):
             groups = self.order.fulfillments.all()
             existing_max = groups.aggregate(Max("fulfillment_order"))
             existing_max = existing_max.get("fulfillment_order__max")
-            self.fulfillment_order = existing_max + 1 if existing_max is not None else 1
+            self.fulfillment_order = (
+                existing_max + 1 if existing_max is not None else 1
+            )
         return super().save(*args, **kwargs)
 
     @property

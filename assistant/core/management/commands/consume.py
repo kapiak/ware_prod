@@ -9,21 +9,33 @@ class Command(BaseCommand):
 
     help = _("Consumes messages from RabbitMQ")
 
-    callback_functions = {
-        'update_user': 'update_user'
-    }
+    callback_functions = {'update_user': 'update_user'}
 
     def add_arguments(self, parser):
-        parser.add_argument('exchange', nargs='+', type=str, help=_("The exchange to consume from."))
-        parser.add_argument('queue', nargs='+', type=str, help=_("The queue to consume from."))
-        parser.add_argument('routing_key', nargs='+', type=str, help=_("The routing key to consume from."))
+        parser.add_argument(
+            'exchange',
+            nargs='+',
+            type=str,
+            help=_("The exchange to consume from."),
+        )
+        parser.add_argument(
+            'queue', nargs='+', type=str, help=_("The queue to consume from.")
+        )
+        parser.add_argument(
+            'routing_key',
+            nargs='+',
+            type=str,
+            help=_("The routing key to consume from."),
+        )
         # parser.add_argument('action', nargs='+', type=str, help=_("The callback function key in the dictionary."))
 
-    def _callback(channel, method, properties, body):
-        self.stdout.write(self.style.SUCCESS(f"{channel} - {method} - {properties} - {body}"))
+    def _callback(self, channel, method, properties, body):
+        self.stdout.write(
+            self.style.SUCCESS(f"{channel} - {method} - {properties} - {body}")
+        )
 
-    def _onerror_callback(error):
-        self.stdout.write(self.style.ERROR(f"{channel} - {method} - {properties} - {body}"))
+    def _onerror_callback(self, error):
+        self.stdout.write(self.style.ERROR(f"{error}"))
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS(f"{options['exchange'][0]}"))

@@ -12,7 +12,10 @@ uvicorn==0.11.8  # https://github.com/encode/uvicorn
 pydantic==1.6.1  # https://github.com/samuelcolvin/pydantic
 measurement==3.2.0  # https://github.com/coddingtonbear/python-measurement
 pika==1.1.0  # https://github.com/pika/pika
-
+maxminddb-geolite2==2018.703  # https://github.com/rr2do2/maxminddb-geolite2
+aiohttp==3.6.2  # https://github.com/aio-libs/aiohttp
+httpx==0.14.1  # https://github.com/encode/httpx
+extruct==0.9.0  # https://github.com/scrapinghub/extruct
 
 # Shopify
 # ------------------------------------------------------------------------------
@@ -20,7 +23,7 @@ ShopifyAPI==8.0.1
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.0.9  # pyup: < 3.1  # https://www.djangoproject.com/
+django==3.1  # pyup: < 3.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==4.0.0  # https://github.com/jazzband/django-model-utils
 django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
@@ -34,6 +37,8 @@ django-measurement==3.2.3  # https://github.com/coddingtonbear/django-measuremen
 django-countries==6.1.2  # https://github.com/SmileyChris/django-countries/
 django-phonenumber-field[phonenumbers]==4.0.0  # https://github.com/stefanfoulis/django-phonenumber-field
 django-versatileimagefield==2.0  # https://github.com/respondcreate/django-versatileimagefield
+django-ipware==3.0.1  # https://github.com/un33k/django-ipware
+django-sequences==2.5  # https://github.com/aaugustin/django-sequences
 
 # Django REST Framework
 djangorestframework==3.11.1  # https://github.com/encode/django-rest-framework
