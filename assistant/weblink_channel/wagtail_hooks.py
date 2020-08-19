@@ -14,7 +14,11 @@ from wagtail.contrib.modeladmin.options import (
     modeladmin_register,
 )
 
-from .helpers import WeblinkOrderItemButtonHelper, PurchaseOrderButtonHelper
+from .helpers import (
+    WeblinkOrderItemButtonHelper,
+    PurchaseOrderButtonHelper,
+    PurchaseOrderPermissionHelper,
+)
 from .models import WebLinkOrder, WebLinkOrderItem, PurchaseOrder
 from .views import PurchaseOrderSubmitView, PurchaseOrderEditView
 
@@ -22,10 +26,10 @@ from .views import PurchaseOrderSubmitView, PurchaseOrderEditView
 class WebLinkOrderWagtilAdmin(ModelAdmin):
     model = WebLinkOrder
     menu_label = _("Orders")
-    menu_icon = 'tag'
+    menu_icon = "tag"
     menu_order = 100
-    list_display = ('number', 'customer')
-    search_fields = ('number', 'customer')
+    list_display = ("number", "customer")
+    search_fields = ("number", "customer")
 
     panels = [
         FieldPanel("number"),
@@ -53,16 +57,18 @@ class WebLinkOrderWagtilAdmin(ModelAdmin):
 class WebLinkOrderItemWagtailAdmin(ModelAdmin):
     model = WebLinkOrderItem
     menu_label = _("Ordered Products")
-    menu_icon = 'tag'
+    menu_icon = "tag"
     list_display = (
-        'url',
-        'name',
-        'provided_price',
-        'quantity',
-        'weight',
-        'status',
+        "url",
+        "name",
+        "provided_price",
+        "quantity",
+        "weight",
+        "status",
+        "variant",
+        "created_at",
     )
-    list_filter = ('status',)
+    list_filter = ("status",)
     button_helper_class = WeblinkOrderItemButtonHelper
     index_view_extra_js = [
         "wagtailadmin/js/modal-workflow.js",
@@ -74,15 +80,29 @@ class PurchaseOrderWagtailAdmin(ModelAdmin):
     model = PurchaseOrder
     menu_label = _("Purchase Orders")
     menu_icon = "tag"
-    menu_order = 300
+    menu_order = 200
+    list_display = ("number", "status", "estimated_arrival", "supplier")
+    list_filter = ("status",)
     button_helper_class = PurchaseOrderButtonHelper
+    permission_helper_class = PurchaseOrderPermissionHelper
     edit_template_name = "weblink_channel/modeladmin/edit.html"
     edit_view_class = PurchaseOrderEditView
     submit_view_class = PurchaseOrderSubmitView
+    submit_view_extra_js = [
+        "wagtailadmin/js/modal-workflow.js",
+        "js/purchase-order-submit.js",
+    ]
+    submit_view_extra_css = []
 
     @cached_property
     def submit_url(self):
-        return self.url_helper.get_action_url('submit', self.pk_quoted)
+        return self.url_helper.get_action_url("submit", self.pk_quoted)
+
+    def get_submit_view_extra_js(self):
+        return self.submit_view_extra_js
+
+    def get_submit_view_extra_css(self):
+        return self.submit_view_extra_css
 
     def submit_view(self, request, instance_pk):
         """
@@ -91,36 +111,36 @@ class PurchaseOrderWagtailAdmin(ModelAdmin):
         model extends 'Page'. The view class used can be overridden by changing
         the  'edit_view_class' attribute.
         """
-        kwargs = {'model_admin': self, 'instance_pk': instance_pk}
+        kwargs = {"model_admin": self, "instance_pk": instance_pk}
         view_class = self.submit_view_class
         return view_class.as_view(**kwargs)(request)
 
     def get_admin_urls_for_registration(self):
         urls = (
             re_path(
-                self.url_helper.get_action_url_pattern('index'),
+                self.url_helper.get_action_url_pattern("index"),
                 self.index_view,
-                name=self.url_helper.get_action_url_name('index'),
+                name=self.url_helper.get_action_url_name("index"),
             ),
             re_path(
-                self.url_helper.get_action_url_pattern('create'),
+                self.url_helper.get_action_url_pattern("create"),
                 self.create_view,
-                name=self.url_helper.get_action_url_name('create'),
+                name=self.url_helper.get_action_url_name("create"),
             ),
             re_path(
-                self.url_helper.get_action_url_pattern('edit'),
+                self.url_helper.get_action_url_pattern("edit"),
                 self.edit_view,
-                name=self.url_helper.get_action_url_name('edit'),
+                name=self.url_helper.get_action_url_name("edit"),
             ),
             re_path(
-                self.url_helper.get_action_url_pattern('delete'),
+                self.url_helper.get_action_url_pattern("delete"),
                 self.delete_view,
-                name=self.url_helper.get_action_url_name('delete'),
+                name=self.url_helper.get_action_url_name("delete"),
             ),
             re_path(
-                self.url_helper.get_action_url_pattern('submit'),
+                self.url_helper.get_action_url_pattern("submit"),
                 self.submit_view,
-                name=self.url_helper.get_action_url_name('submit'),
+                name=self.url_helper.get_action_url_name("submit"),
             ),
         )
         return urls

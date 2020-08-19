@@ -20,13 +20,10 @@ class ProductButtonHelper(ButtonHelper):
         # Define a label for our button
         return {
             "url": reverse(
-                "products:product_orders_modal_workflow",
-                kwargs={"guid": obj.guid},
+                "products:product_orders_modal_workflow", kwargs={"guid": obj.guid},
             ),  # decide where the button links to
             "label": _("Orders"),
-            "classname": self.finalise_classname(
-                self.orders_button_classnames
-            ),
+            "classname": self.finalise_classname(self.orders_button_classnames),
             "title": _("Orders"),
             "id": obj.guid,
         }
@@ -36,9 +33,7 @@ class ProductButtonHelper(ButtonHelper):
         return {
             "url": "/",  # decide where the button links to
             "label": _("Purchase"),
-            "classname": self.finalise_classname(
-                self.purchase_button_classnames
-            ),
+            "classname": self.finalise_classname(self.purchase_button_classnames),
             "title": _("Purchase"),
             "id": obj.guid,
         }
@@ -48,9 +43,7 @@ class ProductButtonHelper(ButtonHelper):
         return {
             "url": "/",  # decide where the button links to
             "label": _("Allocate"),
-            "classname": self.finalise_classname(
-                self.allocate_button_classnames
-            ),
+            "classname": self.finalise_classname(self.allocate_button_classnames),
             "title": _("Allocate"),
             "id": obj.guid,
         }
@@ -89,9 +82,7 @@ class ProductVariantButtonHelper(ButtonHelper):
         return {
             "url": "/",  # decide where the button links to
             "label": _("Purchase"),
-            "classname": self.finalise_classname(
-                self.purchase_button_classnames
-            ),
+            "classname": self.finalise_classname(self.purchase_button_classnames),
             "title": _("Purchase"),
             "id": obj.guid,
         }
@@ -101,14 +92,10 @@ class ProductVariantButtonHelper(ButtonHelper):
         return {
             "url": reverse(
                 "warehouse:allocate_stock_to_line_item",
-                kwargs={
-                    'variant': obj.guid
-                },  # decide where the button links to
+                kwargs={"variant": obj.guid},  # decide where the button links to
             ),
             "label": _("Allocate"),
-            "classname": self.finalise_classname(
-                self.allocate_button_classnames
-            ),
+            "classname": self.finalise_classname(self.allocate_button_classnames),
             "title": _("Allocate"),
             "id": obj.guid,
         }

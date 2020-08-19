@@ -9,13 +9,22 @@
             {% icon name="spinner" %}<em>{% trans 'Save' %}</em>
         </button>
 
-        {% if user_can_delete %}
             <div class="dropdown-toggle">{% icon name="arrow-up" %}</div>
             <ul>
+                {% if user_can_delete %}
                 <li><a href="{{ view.delete_url }}" class="shortcut">{% trans "Delete" %}</a></li>
-                <li><a href="{{ view.submit_url }}" class="shortcut">{% trans "Submit" %}</a></li>
+                {% endif %}
+                {% if user_can_submit %}
+                <li>
+                    <button type="submit"
+                            data-clicked-text="Submitting…"
+                            name="action-submit"
+                            value="action-submit"
+                            class="button button-lolongrunning">
+                      {% trans "Submit" %}
+                </li>
+                {% endif %}
             </ul>
-        {% endif %}
 
     </div>
 {% endblock %}

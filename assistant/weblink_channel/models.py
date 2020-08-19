@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 from django.utils.translation import gettext_lazy as _
 
@@ -34,13 +35,19 @@ class WebLinkOrder(index.Indexed, BaseModel, ClusterableModel):
     """
 
     class StatusChoices(models.TextChoices):
-        NEW = 'new', _("New")
-        INIT = 'init', _("Puchase Order Made")
-        SUBMITTED = 'submitted', _("Submitted Purchase Order")
-        STOCK_RECIEVED = 'stock-recieved', _("Stock Recieved")
-        SENT = 'sent', _("Stock Sent to Customer")
-        CANCELED = 'cancelled', _("Order Cancelled")
+        NEW = "new", _("New")
+        INIT = "init", _("Puchase Order Made")
+        SUBMITTED = "submitted", _("Submitted Purchase Order")
+        STOCK_RECIEVED = "stock-recieved", _("Stock Recieved")
+        SENT = "sent", _("Stock Sent to Customer")
+        CANCELED = "cancelled", _("Order Cancelled")
 
+    order = models.OneToOneField(
+        "orders.Order",
+        related_name="weblink_order",
+        on_delete=models.CASCADE,
+        null=True,
+    )
     number = models.CharField(
         verbose_name=_("Number"),
         max_length=100,
@@ -59,19 +66,13 @@ class WebLinkOrder(index.Indexed, BaseModel, ClusterableModel):
         null=True,
     )
     address = models.ForeignKey(
-        "addresses.Address",
-        related_name="+",
-        on_delete=models.SET_NULL,
-        null=True,
+        "addresses.Address", related_name="+", on_delete=models.SET_NULL, null=True,
     )
     shipping_method = models.CharField(
         verbose_name=_("Shipping Method"), max_length=255, null=True
     )
     weight = MeasurementField(
-        measurement=Weight,
-        unit_choices=WeightUnits.CHOICES,
-        blank=True,
-        null=True,
+        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )  # TODO: move to a relation with the shipping method model
 
     class Meta:
@@ -86,16 +87,14 @@ class WebLinkOrderItem(index.Indexed, Orderable, BaseModel):
     """An item in the Weblink order"""
 
     class StatusChoices(models.TextChoices):
-        NEW = 'new', _("New")
-        INIT = 'init', _("Puchase Order Made")
-        SUBMITTED = 'submitted', _("Submitted Purchase Order")
-        STOCK_RECIEVED = 'stock-recieved', _("Stock Recieved")
-        SENT = 'sent', _("Stock Sent to Customer")
-        CANCELED = 'cancelled', _("Order Cancelled")
+        NEW = "new", _("New")
+        INIT = "init", _("Puchase Order Made")
+        SUBMITTED = "submitted", _("Submitted Purchase Order")
+        STOCK_RECIEVED = "stock-recieved", _("Stock Recieved")
+        SENT = "sent", _("Stock Sent to Customer")
+        CANCELED = "cancelled", _("Order Cancelled")
 
-    order = ParentalKey(
-        WebLinkOrder, related_name="items", on_delete=models.CASCADE
-    )
+    order = ParentalKey(WebLinkOrder, related_name="items", on_delete=models.CASCADE)
     status = models.CharField(
         verbose_name=_("Status"),
         max_length=100,
@@ -111,12 +110,15 @@ class WebLinkOrderItem(index.Indexed, Orderable, BaseModel):
     )
     quantity = models.PositiveIntegerField()
     weight = MeasurementField(
-        measurement=Weight,
-        unit_choices=WeightUnits.CHOICES,
-        blank=True,
-        null=True,
+        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )
     comments = models.TextField(verbose_name=_("Comments"), blank=True)
+    variant = models.ForeignKey(
+        "products.ProductVariant",
+        related_name="weblink_order_item",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _("Web Link Order Item")
@@ -130,17 +132,16 @@ class PurchaseOrder(index.Indexed, BaseModel, ClusterableModel):
     """Represents the order made to the product supplier to pruchase the item."""
 
     class StatusChoices(models.TextChoices):
-        DRAFT = 'draft', _("Draft")
-        SENT = 'sent', _("Sent")
-        RECIEVED = 'recieved', _("Recieved")
+        DRAFT = "draft", _("Draft")
+        SENT = "sent", _("Sent")
+        RECIEVED = "recieved", _("Recieved")
+        PARTIAL = "partial", _("Partially Recieved")
 
     sales_order = models.ForeignKey(
         WebLinkOrder, related_name="purchase_orders", on_delete=models.PROTECT
     )
     number = models.CharField(verbose_name=_("Number"), max_length=100)
-    estimated_arrival = models.IntegerField(
-        verbose_name=_("Estimated Arrival in Days")
-    )
+    estimated_arrival = models.IntegerField(verbose_name=_("Estimated Arrival in Days"))
     supplier = models.ForeignKey(
         "products.Supplier",
         related_name="purchase_orders",
@@ -165,15 +166,26 @@ class PurchaseOrder(index.Indexed, BaseModel, ClusterableModel):
 class PurchaseOrderItem(index.Indexed, Orderable, BaseModel):
     """Represents an item in the purchase order"""
 
+    class StatusChoices(models.TextChoices):
+        DRAFT = "draft", _("Draft")
+        SENT = "sent", _("Sent")
+        RECIEVED = "recieved", _("Recieved")
+        PARTIAL = "partial", _("Partially Recieved")
+
     purchase_order = ParentalKey(
         PurchaseOrder, related_name="items", on_delete=models.CASCADE
     )
     sales_order_item = models.OneToOneField(
-        WebLinkOrderItem,
-        related_name="puchase_order_item",
-        on_delete=models.CASCADE,
+        WebLinkOrderItem, related_name="puchase_order_item", on_delete=models.CASCADE,
     )
     quantity = models.PositiveIntegerField()
+    status = models.CharField(
+        verbose_name=_("Stauts"),
+        max_length=100,
+        choices=StatusChoices.choices,
+        default=StatusChoices.DRAFT,
+    )
+    recieved = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = _("Purchase Order Item")

@@ -5,6 +5,7 @@ from .views import (
     get_product_by_link_sync,
     checkout,
     add_to_purchase_order,
+    mark_pruchase_item_recieved,
 )
 
 app_name = "weblink_channel"
@@ -21,5 +22,10 @@ urlpatterns = [
         "add-to-pruchase/<uuid:item_uuid>",
         add_to_purchase_order,
         name="add_to_purchase_order",
+    ),
+    path(
+        "mark_pruchase_item_recieved/<uuid:item_uuid>",
+        mark_pruchase_item_recieved,
+        name="mark_pruchase_item_recieved",
     ),
 ]

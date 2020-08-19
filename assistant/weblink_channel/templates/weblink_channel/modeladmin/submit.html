@@ -58,7 +58,8 @@
               <tr>
                 <th>{% trans 'Item' %}</th>
                 <th>{% trans 'Status' %}</th>
-                <th>{% trans 'quantity' %}</th>
+                <th>{% trans 'Quantity' %}</th>
+                <th>{% trans 'Recieved' %}</th>
               </tr>
             </thead>
             <tbody>
@@ -68,21 +69,24 @@
                   <h2><a href="">{{ item.sales_order_item.name }} </a></h2>
                   <ul class="actions">
                     <li>
-                      <a href="#"
-                         class="button button-small button-secondary" 
-                         title="Mark Recieved">Mark Recieved
+                      <a href="{% url 'weblink_channel:mark_pruchase_item_recieved' item.guid %}"
+                         class="button button-small button-secondary recieve-button" 
+                         title="Mark Recieved">
+                         {% trans 'Mark Recieved' %}
                       </a>
                     </li>
                     <li>
                       <a href="#"
-                          class="button no button-small button-secondary" 
-                          title="Mark Unrecieved">Not Recieved
+                          class="button no button-small button-secondary missing-button" 
+                          title="Mark Unrecieved">
+                          {% trans 'Not Recieved' %}
                       </a>
                     </li>
                 </ul>
               </td>
               <td>{{ item.sales_order_item.status }}</td>
               <td>{{ item.quantity }}</td>
+              <td>{{ item.recieved }}</td>
               </tr>
               {% endfor %}
             </tbody>
