@@ -10,7 +10,7 @@ env:
   IMAGE: "safely"
   REGISTRY_HOSTNAME: docker.pkg.github.com
   GITHUB_SHA: ${{ github.sha }}
-  GH_TOKEN: ${{ GH_TOKEN }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   build:
