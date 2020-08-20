@@ -1,16 +1,16 @@
 {% load wagtailimages_tags wagtailadmin_tags %}
 {% load i18n %}
-{% trans "Purchase Order Item Recieve Form" as ins_emb_str %}
+{% trans "Purchase Order Item Receive Form" as ins_emb_str %}
 {% include "wagtailadmin/shared/header.html" with title=ins_emb_str merged=1 %}
 
 <section class="nice-padding">
-  <form class="purchase-recieve"
-        action="{% url 'weblink_channel:mark_pruchase_item_recieved' item.guid %}"
+  <form class="purchase-receive"
+        action="{% url 'weblink_channel:mark_purchase_item_received' item.guid %}"
         enctype="multipart/form-data"
         method="POST"
         novalidate="">
       {% csrf_token %}
       {{ form.as_p }}       
-      <button id="recieve-item" name="recieve-item" type="submit">Submit</button>
+      <button id="receive-item" name="receive-item" type="submit">Submit</button>
     </form>
 </section>

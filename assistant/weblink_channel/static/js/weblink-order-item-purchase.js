@@ -48,14 +48,14 @@ $(function () {
         },
 
         choosen: function (modal, jsonData) {
-          /* When the pruchase order form submition is succuful  */
+          /* When the purchase order form submition is succuful  */
           addMessage("success", "Added to Purchase Order");
           modal.close();
         },
 
         choosen_already: function (modal, jsonData) {
           /* If a purchase already is already associated with this item  */
-          addMessage("warning", "Puchase Order already exist for this item");
+          addMessage("warning", "Purchase Order already exist for this item");
           modal.close();
         },
       },

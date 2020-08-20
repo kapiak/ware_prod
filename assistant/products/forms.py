@@ -4,12 +4,10 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from assistant.products.models import Supplier
-from .helpers import (
-    process_purchase_order,
-    process_add_to_purchase_order,
-    process_receive_purchase_order_item,
-)
-from .models import WebLinkOrderItem, PurchaseOrder, PurchaseOrderItem
+from assistant.weblink_channel.models import PurchaseOrder, PurchaseOrderItem
+from assistant.orders.models import Order, LineItem
+
+from .services import process_add_to_purchase_order, process_purchase_order
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +16,7 @@ class PurchaseOrderAddForm(forms.Form):
     purchase_order = forms.UUIDField()
     add_type = forms.CharField()
 
-    def save(self, item: WebLinkOrderItem):
+    def save(self, item: LineItem):
         obj = process_add_to_purchase_order(item=item, **self.cleaned_data)
         return obj
 
@@ -39,7 +37,7 @@ class PurchaseOrderForm(forms.Form):
     estimated_arrival = forms.IntegerField()
     quantity = forms.IntegerField()
 
-    def save(self, item: WebLinkOrderItem):
+    def save(self, item: LineItem):
         obj = process_purchase_order(item=item, **self.cleaned_data)
         return obj
 
@@ -52,18 +50,19 @@ class PurchaseOrderForm(forms.Form):
             )
 
 
-class PurchaseOrderItemReceiveForm(forms.Form):
-    quantity = forms.IntegerField()
-    missing = forms.IntegerField()
+class AllocationForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        variant = kwargs.pop("variant")
+        super().__init__(*args, **kwargs)
+        self.fields["orders"].queryset = LineItem.objects.exclude(
+            models.Q(
+                order__status__in=[
+                    Order.StatusChoices.FULFILLED,
+                    Order.StatusChoices.CANCELED,
+                ]
+            ),
+            models.Q(variant=variant),
+        )
 
-    def save(self, item: PurchaseOrderItem):
-        if item.quantity < self.cleaned_data["quantity"]:
-            logger.debug(
-                f"Exception raised due to heigher received quantity for {item.guid}"
-            )
-            raise forms.ValidationError(
-                message=_("Quantity Received is more than ordered"), code="invalid",
-            )
-        obj = process_receive_purchase_order_item(item=item, **self.cleaned_data)
-        logger.debug(f"processing of {obj.guid} has been completed.")
-        return obj
+    orders = forms.ModelMultipleChoiceField(queryset=LineItem.objects.none())
+

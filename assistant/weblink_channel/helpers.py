@@ -74,14 +74,30 @@ class PurchaseOrderButtonHelper(ButtonHelper):
         "icon-repeat",
         "submit-button",
     ]
+    receive_button_classnames = [
+        "button-small",
+        "icon",
+        "icon-repeat",
+        "receive-button",
+    ]
 
     def submit_button(self, obj):
         # Define a label for our button
         return {
-            "url": "",  # decide where the button links to
+            "url": f"/cms/weblinkchannel/purchaseorder/submit/{obj.guid}",  # decide where the button links to
             "label": _("Submit"),
             "classname": self.finalise_classname(self.submit_button_classnames),
             "title": _("Submit"),
+            "id": obj.guid,
+        }
+
+    def receive_button(self, obj):
+        # Define a label for our button
+        return {
+            "url": f"/cms/weblink_channel/purchaseorder/receive/{obj.pk}/",  # decide where the button links to
+            "label": _("Receive"),
+            "classname": self.finalise_classname(self.receive_button_classnames),
+            "title": _("Receive"),
             "id": obj.guid,
         }
 
@@ -95,14 +111,16 @@ class PurchaseOrderButtonHelper(ButtonHelper):
         btns = super().get_buttons_for_obj(
             obj, exclude, classnames_add, classnames_exclude
         )
-        if "submit_button" not in (exclude or []):
+        if "submit" not in (exclude or []):
             btns.append(self.submit_button(obj))
+        if "receive" not in (exclude or []):
+            btns.append(self.receive_button(obj))
         return btns
 
 
 class PurchaseOrderURLHelper(AdminURLHelper):
     def get_action_url_pattern(self, action):
-        if action in ("create", "submit", "index"):
+        if action in ("create", "receive", "index"):
             return self._get_action_url_pattern(action)
         return self._get_object_specific_action_url_pattern(action)
 
@@ -114,14 +132,14 @@ class PurchaseOrderURLHelper(AdminURLHelper):
         )
 
     def get_action_url(self, action, *args, **kwargs):
-        if action in ("create", "submit", "index"):
+        if action in ("create", "receive", "index"):
             return reverse(self.get_action_url_name(action))
         url_name = self.get_action_url_name(action)
         return reverse(url_name, args=args, kwargs=kwargs)
 
     @cached_property
-    def submit_url(self):
-        return self.get_action_url("submit")
+    def receive_url(self):
+        return self.get_action_url("receive")
 
 
 class PurchaseOrderPermissionHelper(PermissionHelper):
@@ -131,7 +149,7 @@ class PurchaseOrderPermissionHelper(PermissionHelper):
         purchase order
         """
         logger.debug("Check if the user has permission to submit %s" % obj)
-        perm_codename = self.get_perm_codename("submit")
+        perm_codename = self.get_perm_codename("receive")
         return self.user_has_specific_permission(user, perm_codename)
 
 
@@ -181,7 +199,7 @@ def process_weblink_checkout(**values) -> WebLinkOrder:
         raise EmailAlreadyExists(
             message=_("Email Already Registered"), code=_("exists")
         )
-    order = WebLinkOrder.objects.create(
+    order = WebLinkOrder(
         number=get_next_value("weblink_order_number", initial_value=1000),
         customer=user,
         address=address,
@@ -265,19 +283,19 @@ def process_purchase_order(item: WebLinkOrderItem, **data) -> PurchaseOrder:
 
 
 @transaction.atomic
-def process_recieve_purchase_order_item(
+def process_receive_purchase_order_item(
     item: PurchaseOrderItem, **data
 ) -> PurchaseOrderItem:
     logger.debug("processing the item %s" % item.guid)
-    item.recieved = F("received") + data["quantity"]
-    if item.recieved == item.quantity:
-        logger.info("the item is fully recieved")
-        item.status = PurchaseOrderItem.StatusChoices.RECIEVED
+    item.received = F("received") + data["quantity"]
+    if item.received == item.quantity:
+        logger.info("the item is fully received")
+        item.status = PurchaseOrderItem.StatusChoices.RECEIVED
     else:
-        logger.info("the item is partially recieved")
+        logger.info("the item is partially received")
         item.status = PurchaseOrderItem.StatusChoices.PARTIAL
     item.save()
-    logger.info("processing recieve completed")
+    logger.info("processing receive completed")
     return item
 
 

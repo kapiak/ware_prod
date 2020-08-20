@@ -1,4 +1,5 @@
 {
-    "python.linting.pylintEnabled": true,
-    "python.pythonPath": "/home/mrb/.cache/pypoetry/virtualenvs/platform-5ecxEtAu-py3.8/bin/python3"
+  "python.linting.pylintEnabled": true,
+  "python.pythonPath": "/home/mrb/.cache/pypoetry/virtualenvs/platform-5ecxEtAu-py3.8/bin/python3",
+  "prettier.disableLanguages": ["html"]
 }

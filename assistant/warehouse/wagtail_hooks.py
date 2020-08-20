@@ -17,7 +17,7 @@ from .models import Warehouse, Stock, Allocation
 
 class WarehouseWagtailAdmin(ModelAdmin):
     model = Warehouse
-    menu_icon = "house"
+    menu_icon = "home"
     menu_order = 100
     list_display = ("name", "company_name", "email")
     search_fields = ("name", "company_name", "email")
@@ -49,6 +49,7 @@ class StockWagtailAdmin(ModelAdmin):
 class AllocationWagtailAdmin(ModelAdmin):
     model = Allocation
     menu_icon = "chain-broken"
+    list_display = ("order_line", "stock", "quantity_allocated")
     menu_order = 300
 
 

@@ -1,0 +1,20 @@
+{% load wagtailimages_tags wagtailadmin_tags %}
+{% load i18n %}
+{% trans "Allocate Stock to Order" as ins_emb_str %}
+{% include "wagtailadmin/shared/header.html" with title=ins_emb_str subtitle=obj.name merged=1 %}
+
+<section id="new" class="nice-padding">
+  <div class="help-block help-info">
+    <p>{% blocktrans with quantity=obj.available_stock.quantity %}You can allocate {{ quantity }} products to the orders.{% endblocktrans %}</p>
+    <p>{% blocktrans %}Please choose the orders to allocate to and the stock will be allocated to earliest of those orders..{% endblocktrans %}</p>
+  </div>
+  <form class="allocation-create no-float-elements"
+        action="{% url 'products:allocate_product_to_order' obj.guid %}"
+        enctype="multipart/form-data"
+        method="POST"
+        novalidate="">
+    {% csrf_token %}
+    {{ form.as_p }}       
+    <button id="product-allocation" type="submit">Submit</button>
+  </form>
+</section>

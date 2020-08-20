@@ -78,9 +78,7 @@ class Stock(BaseModel):
     objects = StockQuerySet.as_manager()
 
     def __str__(self):
-        return (
-            f"{self.warehouse} - {self.product_variant.sku} -> {self.quantity}"
-        )
+        return f"{self.warehouse} - {self.product_variant.sku} -> {self.quantity}"
 
     def increase_stock(self, quantity: int, commit: bool = True):
         """Incase given quantity of product variant to a stock in a warehouse."""
@@ -103,20 +101,26 @@ class Stock(BaseModel):
         """
         with transaction.atomic():
             if self.quantity >= quantity:
+                logger.info("We are allocating stock")
                 Allocation.objects.create(
-                    order_line=line_item,
-                    stock=self,
-                    quantity_allocated=quantity,
+                    order_line=line_item, stock=self, quantity_allocated=quantity,
                 )
                 self.stock = F("quantity") - quantity
                 self.save()
                 logger.info(f"Allocated stock to order.")
                 return True
-            logger.info("Not enough stock is available.")
-            return InsufficientStock(
-                line_item.variant,
-                context={"line_item": line_item, "warehouse_guid": self.guid},
-            )
+            elif self.quantity > 0:
+                logger.info("Not enough stock is available.")
+                logger.info("We are allocating currently available stock")
+                Allocation.objects.create(
+                    order_line=line_item, stock=self, quantity_allocated=self.quantity,
+                )
+                self.stock = F("quantity") - self.quantity
+                self.save()
+                logger.info(f"Allocated stock to order.")
+                return True
+            else:
+                raise InsufficientStock(_("Not enough Stock"), code="no_stock")
 
     class Meta:
         verbose_name = _("Stock")
@@ -143,3 +147,6 @@ class Allocation(models.Model):
     class Meta:
         verbose_name = _("Allocation")
         verbose_name_plural = _("Allocations")
+
+    def __str__(self):
+        return f"{self.order_lines} allocated {self.quantity_allocated}"

@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.db import models
 
 from wagtail.admin.edit_handlers import TabbedInterface, ObjectList, FieldPanel
 from wagtail.admin.edit_handlers import (
@@ -14,6 +15,9 @@ from wagtail.contrib.modeladmin.options import (
 )
 from wagtail.contrib.modeladmin.mixins import ThumbnailMixin
 
+from assistant.warehouse.models import Stock
+from assistant.orders.models import Order, LineItem
+from assistant.purchases.models import PurchaseOrderItem
 from .models import Vendor, Product, ProductVariant
 from .helpers import ProductButtonHelper, ProductVariantButtonHelper
 
@@ -55,8 +59,7 @@ class ProductWagtailAdmin(ModelAdmin):
         FieldPanel("description", classname="full"),
         FieldPanel("weight"),
         MultiFieldPanel(
-            [FieldPanel("max_price"), FieldPanel("min_price")],
-            heading="Prices",
+            [FieldPanel("max_price"), FieldPanel("min_price")], heading="Prices",
         ),
     ]
     variant_panel = [
@@ -100,17 +103,27 @@ class ProductVariantWagtailAdmin(ThumbnailMixin, ModelAdmin):
     model = ProductVariant
     menu_icon = "tick"
     menu_order = 300
-    inspect_view_enabled = True
     list_per_page = 20
     list_display_add_buttons = "sku"
-    list_display = ("get_first_image", "sku", "barcode", "name", "price")
+    list_display = (
+        "get_first_image",
+        "sku",
+        "name",
+        "price",
+        "needed_stock",
+        "available_stock",
+        "allocated",
+        "quantity_in_purchase",
+        "to_purchase",
+        "created_at",
+    )
     # list_filter = ('product', 'price', 'cost_price', 'weight')
     search_fields = ("sku", "barcode", "name")
     button_helper_class = ProductVariantButtonHelper
     thumb_image_field_name = "Image"
     index_view_extra_js = [
         "wagtailadmin/js/modal-workflow.js",
-        "js/related_line_items.js",
+        "js/product-variant-index-buttons.js",
     ]
 
     panels = [
@@ -119,11 +132,42 @@ class ProductVariantWagtailAdmin(ThumbnailMixin, ModelAdmin):
         ),
         FieldPanel("name"),
         MultiFieldPanel(
-            [FieldPanel("price"), FieldPanel("cost_price")],
-            heading=_("Prices"),
+            [FieldPanel("price"), FieldPanel("cost_price")], heading=_("Prices"),
         ),
         FieldPanel("weight"),
     ]
+
+    def get_queryset(self, request):
+        qs = self.model.objects.select_related("product").prefetch_related(
+            "order_lines", "order_lines__purchase_order"
+        )
+        ordering = self.get_ordering(request)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return qs
+
+    def available_stock(self, obj):
+        val = obj.available_stock["quantity"] or 0
+        return val
+
+    def needed_stock(self, obj):
+        val = obj.needed_stock["quantity"] or 0
+        return val
+
+    def quantity_in_purchase(self, obj):
+        val = obj.in_purchase["quantity"] or 0
+        return val
+
+    def to_purchase(self, obj):
+        return (
+            self.needed_stock(obj)
+            - self.available_stock(obj)
+            - self.quantity_in_purchase(obj)
+        )
+
+    def allocated(self, obj):
+        val = obj.allocated
+        return val
 
 
 class ProductWagtailAdminGroup(ModelAdminGroup):

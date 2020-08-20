@@ -14,7 +14,12 @@ class ProductButtonHelper(ButtonHelper):
         "orders-button",
     ]
     purchase_button_classnames = ["button-small", "icon", "icon-repeat"]
-    allocate_button_classnames = ["button-small", "icon", "icon-link"]
+    allocate_button_classnames = [
+        "button-small",
+        "icon",
+        "icon-link",
+        "purchase-button",
+    ]
 
     def orders_button(self, obj):
         # Define a label for our button
@@ -31,7 +36,9 @@ class ProductButtonHelper(ButtonHelper):
     def purchase_button(self, obj):
         # Define a label for our button
         return {
-            "url": "/",  # decide where the button links to
+            "url": reverse(
+                "products:make_product_purchase", kwargs={"guid": obj.guid}
+            ),  # decide where the button links to
             "label": _("Purchase"),
             "classname": self.finalise_classname(self.purchase_button_classnames),
             "title": _("Purchase"),
@@ -69,18 +76,31 @@ class ProductButtonHelper(ButtonHelper):
 
 class ProductVariantButtonHelper(ButtonHelper):
 
-    purchase_button_classnames = ["button-small", "icon", "icon-repeat"]
     allocate_button_classnames = [
         "button-small",
         "icon",
         "icon-link",
         "allocate-button",
     ]
+    purchase_button_classnames = [
+        "button-small",
+        "icon",
+        "icon-repeat",
+        "purchase-button",
+    ]
+    receive_button_classnames = [
+        "button-small",
+        "icon",
+        "icon-repeat",
+        "receive-button",
+    ]
 
     def purchase_button(self, obj):
         # Define a label for our button
         return {
-            "url": "/",  # decide where the button links to
+            "url": reverse(
+                "products:make_product_purchase", kwargs={"guid": obj.guid}
+            ),  # decide where the button links to
             "label": _("Purchase"),
             "classname": self.finalise_classname(self.purchase_button_classnames),
             "title": _("Purchase"),
@@ -91,12 +111,25 @@ class ProductVariantButtonHelper(ButtonHelper):
         # Define a label for our button
         return {
             "url": reverse(
-                "warehouse:allocate_stock_to_line_item",
-                kwargs={"variant": obj.guid},  # decide where the button links to
+                "products:allocate_product_to_order",
+                kwargs={"guid": obj.guid},  # decide where the button links to
             ),
             "label": _("Allocate"),
             "classname": self.finalise_classname(self.allocate_button_classnames),
             "title": _("Allocate"),
+            "id": obj.guid,
+        }
+
+    def receive_button(self, obj):
+        # Define a label for our button
+        return {
+            "url": reverse(
+                "products:receive_product_stock",
+                kwargs={"guid": obj.guid},  # decide where the button links to
+            ),
+            "label": _("Receive"),
+            "classname": self.finalise_classname(self.receive_button_classnames),
+            "title": _("Receive"),
             "id": obj.guid,
         }
 
@@ -112,6 +145,9 @@ class ProductVariantButtonHelper(ButtonHelper):
         )
         if "purchase" not in (exclude or []):
             btns.append(self.purchase_button(obj))
+        if "receive" not in (exclude or []):
+            btns.append(self.receive_button(obj))
         if "allocate" not in (exclude or []):
             btns.append(self.allocate_button(obj))
+
         return btns

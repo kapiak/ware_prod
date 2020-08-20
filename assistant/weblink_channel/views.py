@@ -1,45 +1,36 @@
+import io
 import json
 import logging
-import io
-import aiohttp
-import requests
 import uuid
 
+import aiohttp
+import requests
 from django import forms
-from django.db import transaction
-from django.utils.translation import gettext_lazy as _
-from django.http import HttpRequest, JsonResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
+from django.http import HttpRequest, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.functional import cached_property
-from django.shortcuts import redirect
 from django.utils.text import capfirst
-
-from rest_framework.parsers import JSONParser
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
-from wagtail.admin.modal_workflow import render_modal_workflow
-from wagtail.contrib.modeladmin.views import (
-    InstanceSpecificView,
-    EditView,
-    IndexView,
-)
+from rest_framework.parsers import JSONParser
 from wagtail.admin import messages
+from wagtail.admin.modal_workflow import render_modal_workflow
+from wagtail.contrib.modeladmin.views import EditView, InstanceSpecificView
 
+from assistant.orders.services import process_order
+
+from .forms import PurchaseOrderAddForm, PurchaseOrderForm, PurchaseOrderItemReceiveForm
 from .helpers import (
+    EmailAlreadyExists,
     extract_metadata,
     extract_metadata_sync,
     process_weblink_checkout,
-    EmailAlreadyExists,
     submit_order_for_purchase,
 )
-from .forms import (
-    PurchaseOrderForm,
-    PurchaseOrderAddForm,
-    PurchaseOrderItemRecieveForm,
-)
-from .serializers import ProductURLSerializer, CartSerializer
-from .models import PurchaseOrder, WebLinkOrderItem, PurchaseOrderItem
+from .models import PurchaseOrder, PurchaseOrderItem, WebLinkOrderItem
+from .serializers import CartSerializer, ProductURLSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +50,6 @@ async def get_product_by_link(request: HttpRequest) -> JsonResponse:
                         response_data, serializer.data["link"]
                     )
                     data.update(data)
-                    print("DATA: ", data)
             return JsonResponse(data)
         return JsonResponse(
             serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -94,7 +84,8 @@ def checkout(request: HttpRequest) -> JsonResponse:
         serializer = CartSerializer(data=data)
         if serializer.is_valid():
             try:
-                process_weblink_checkout(**serializer.data)
+                # process_weblink_checkout(**serializer.data)
+                process_order(**serializer.data)
             except EmailAlreadyExists as eae:
                 return JsonResponse(
                     {"message": eae.message, "code": eae.code},
@@ -129,7 +120,6 @@ def add_to_purchase_order(request: HttpRequest, item_uuid: uuid.UUID) -> JsonRes
                     return render_modal_workflow(
                         request, None, None, json_data={"step": "choosen_already"},
                     )
-            print(form.errors)
             return render_modal_workflow(
                 request, None, None, json_data={"step": "choosen"}
             )
@@ -141,7 +131,7 @@ def add_to_purchase_order(request: HttpRequest, item_uuid: uuid.UUID) -> JsonRes
                     request,
                     None,
                     None,
-                    {"pruchase_order": obj},
+                    {"purchase_order": obj},
                     json_data={"step": "choosen"},
                 )
             except IntegrityError as ie:
@@ -208,24 +198,24 @@ class PurchaseOrderEditView(EditView):
         return self.render_to_response(self.get_context_data())
 
 
-class PurchaseOrderSubmitView(InstanceSpecificView):
-    template_name = "weblink_channel/modeladmin/submit.html"
+class PurchaseOrderReceiveView(InstanceSpecificView):
+    template_name = "weblink_channel/modeladmin/receive.html"
 
     @property
     def media(self):
         return forms.Media(
-            css={"all": self.model_admin.get_submit_view_extra_css()},
-            js=self.model_admin.get_submit_view_extra_js(),
+            css={"all": self.model_admin.get_receive_view_extra_css()},
+            js=self.model_admin.get_receive_view_extra_js(),
         )
 
 
-def mark_pruchase_item_recieved(
+def mark_purchase_item_received(
     request: HttpRequest, item_uuid: uuid.UUID
 ) -> JsonResponse:
     item = get_object_or_404(PurchaseOrderItem, guid=item_uuid)
     if request.method == "POST":
         logger.debug(f"Post request with data: {request.POST}")
-        form = PurchaseOrderItemRecieveForm(request.POST)
+        form = PurchaseOrderItemReceiveForm(request.POST)
         if form.is_valid():
             logger.debug("the form is valid")
             try:
@@ -233,7 +223,7 @@ def mark_pruchase_item_recieved(
                 logger.debug(f"form is saved and returned {obj.guid}")
                 return render_modal_workflow(
                     request,
-                    "weblink_channel/choosers/recieve_purchased_item.html",
+                    "weblink_channel/choosers/receive_purchased_item.html",
                     None,
                     {"item": item, "obj": obj},
                     json_data={"step": "marked"},
@@ -242,7 +232,7 @@ def mark_pruchase_item_recieved(
                 logger.debug(f" Validation error with: {ve}")
                 return render_modal_workflow(
                     request,
-                    "weblink_channel/choosers/recieve_purchased_item.html",
+                    "weblink_channel/choosers/receive_purchased_item.html",
                     None,
                     {"item": item, "form": form},
                     json_data={"step": "invalid"},
@@ -250,18 +240,17 @@ def mark_pruchase_item_recieved(
         logger.debug(f"the form is not valid and the errors are: {form.errors}")
         return render_modal_workflow(
             request,
-            "weblink_channel/choosers/recieve_purchased_item.html",
+            "weblink_channel/choosers/receive_purchased_item.html",
             None,
             {"item": item, "form": form},
             json_data={"step": "invalid"},
         )
     logger.debug("Its a get request")
-    form = PurchaseOrderItemRecieveForm(initial={"quantity": item.quantity})
+    form = PurchaseOrderItemReceiveForm(initial={"quantity": item.quantity})
     return render_modal_workflow(
         request,
-        "weblink_channel/choosers/recieve_purchased_item.html",
+        "weblink_channel/choosers/receive_purchased_item.html",
         None,
         {"item": item, "form": form},
         json_data={"step": "chooser"},
     )
-

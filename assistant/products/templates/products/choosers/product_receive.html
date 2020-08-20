@@ -1,0 +1,16 @@
+{% load wagtailimages_tags wagtailadmin_tags %}
+{% load i18n %}
+{% trans "Stock Receiving Form" as ins_emb_str %}
+{% include "wagtailadmin/shared/header.html" with title=ins_emb_str subtitle=obj.name merged=1 %}
+
+<section id="new" class="nice-padding">
+  <form class="receive-create no-float-elements"
+        action="{% url 'products:receive_product_stock' obj.guid %}"
+        enctype="multipart/form-data"
+        method="POST"
+        novalidate="">
+    {% csrf_token %}
+    {{ form.as_p }}       
+    <button id="new-purchase-order" name="new-purchase-order" type="submit">Submit</button>
+  </form>
+</section>

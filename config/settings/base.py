@@ -117,6 +117,7 @@ LOCAL_APPS = [
     "assistant.products.apps.ProductsConfig",
     "assistant.orders.apps.OrdersConfig",
     "assistant.warehouse.apps.WarehouseConfig",
+    "assistant.purchases.apps.PurchasesConfig",
     "assistant.weblink_channel.apps.WeblinkChannelConfig",
     # Your stuff: custom apps go here
     "assistant.shopify_sync.apps.ShopifySyncConfig",

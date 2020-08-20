@@ -36,9 +36,9 @@ class WebLinkOrder(index.Indexed, BaseModel, ClusterableModel):
 
     class StatusChoices(models.TextChoices):
         NEW = "new", _("New")
-        INIT = "init", _("Puchase Order Made")
+        INIT = "init", _("Purchase Order Made")
         SUBMITTED = "submitted", _("Submitted Purchase Order")
-        STOCK_RECIEVED = "stock-recieved", _("Stock Recieved")
+        STOCK_RECEIVED = "stock-received", _("Stock Received")
         SENT = "sent", _("Stock Sent to Customer")
         CANCELED = "cancelled", _("Order Cancelled")
 
@@ -90,7 +90,7 @@ class WebLinkOrderItem(index.Indexed, Orderable, BaseModel):
         NEW = "new", _("New")
         INIT = "init", _("Puchase Order Made")
         SUBMITTED = "submitted", _("Submitted Purchase Order")
-        STOCK_RECIEVED = "stock-recieved", _("Stock Recieved")
+        STOCK_RECEIVED = "stock-received", _("Stock Received")
         SENT = "sent", _("Stock Sent to Customer")
         CANCELED = "cancelled", _("Order Cancelled")
 
@@ -134,17 +134,17 @@ class PurchaseOrder(index.Indexed, BaseModel, ClusterableModel):
     class StatusChoices(models.TextChoices):
         DRAFT = "draft", _("Draft")
         SENT = "sent", _("Sent")
-        RECIEVED = "recieved", _("Recieved")
+        RECEIVED = "received", _("Received")
         PARTIAL = "partial", _("Partially Recieved")
 
     sales_order = models.ForeignKey(
-        WebLinkOrder, related_name="purchase_orders", on_delete=models.PROTECT
+        WebLinkOrder, related_name="weblink_purchase_orders", on_delete=models.PROTECT
     )
     number = models.CharField(verbose_name=_("Number"), max_length=100)
     estimated_arrival = models.IntegerField(verbose_name=_("Estimated Arrival in Days"))
     supplier = models.ForeignKey(
         "products.Supplier",
-        related_name="purchase_orders",
+        related_name="weblink_purchase_orders",
         on_delete=models.SET_NULL,
         null=True,
     )
@@ -169,24 +169,32 @@ class PurchaseOrderItem(index.Indexed, Orderable, BaseModel):
     class StatusChoices(models.TextChoices):
         DRAFT = "draft", _("Draft")
         SENT = "sent", _("Sent")
-        RECIEVED = "recieved", _("Recieved")
+        RECEIVED = "received", _("Received")
         PARTIAL = "partial", _("Partially Recieved")
 
     purchase_order = ParentalKey(
-        PurchaseOrder, related_name="items", on_delete=models.CASCADE
+        PurchaseOrder, related_name="weblink_items", on_delete=models.CASCADE
     )
     sales_order_item = models.OneToOneField(
-        WebLinkOrderItem, related_name="puchase_order_item", on_delete=models.CASCADE,
+        WebLinkOrderItem,
+        related_name="web_purchase_order_item",
+        on_delete=models.CASCADE,
+    )
+    customer_order_item = models.OneToOneField(
+        "orders.LineItem",
+        related_name="weblink_purchase_order_item",
+        on_delete=models.SET_NULL,
+        null=True,
     )
     quantity = models.PositiveIntegerField()
     status = models.CharField(
-        verbose_name=_("Stauts"),
+        verbose_name=_("Status"),
         max_length=100,
         choices=StatusChoices.choices,
         default=StatusChoices.DRAFT,
     )
-    recieved = models.PositiveIntegerField(default=0)
+    received = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = _("Purchase Order Item")
-        verbose_name_plural = _("Pruchase Order Items")
+        verbose_name_plural = _("Purchase Order Items")

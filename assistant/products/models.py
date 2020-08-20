@@ -78,10 +78,7 @@ class ProductType(index.Indexed, BaseModel):
     )
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
     weight = MeasurementField(
-        measurement=Weight,
-        unit_choices=WeightUnits.CHOICES,
-        blank=True,
-        null=True,
+        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )
 
     class Meta:
@@ -101,20 +98,14 @@ class Product(index.Indexed, BaseModel, ClusterableModel):
     """
 
     product_type = models.ForeignKey(
-        ProductType,
-        related_name="products",
-        on_delete=models.SET_NULL,
-        null=True,
+        ProductType, related_name="products", on_delete=models.SET_NULL, null=True,
     )
 
     title = models.CharField(max_length=200, blank=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
     description = RichTextField(blank=True, null=True)
     weight = MeasurementField(
-        measurement=Weight,
-        unit_choices=WeightUnits.CHOICES,
-        blank=True,
-        null=True,
+        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )
 
     max_price = MoneyField(
@@ -144,11 +135,11 @@ class Product(index.Indexed, BaseModel, ClusterableModel):
         return images[0] if images else None
 
     search_fields = [
-        index.SearchField('title'),
-        index.SearchField('product_type'),
-        index.SearchField('description'),
-        index.FilterField('vendor'),
-        index.FilterField('created_at'),
+        index.SearchField("title"),
+        index.SearchField("product_type"),
+        index.SearchField("description"),
+        index.FilterField("vendor"),
+        index.FilterField("created_at"),
     ]
 
 
@@ -172,16 +163,12 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
     * A variant is in stock, if it has unallocated quantity.
     """
 
-    product = ParentalKey(
-        Product, related_name="variants", on_delete=models.CASCADE
-    )
+    product = ParentalKey(Product, related_name="variants", on_delete=models.CASCADE)
 
     sku = models.CharField(
         verbose_name=_("SKU (Stock Keeping Unit)"), max_length=255, unique=True
     )
-    barcode = models.CharField(
-        verbose_name=_("Barcode"), max_length=255, unique=True
-    )
+    barcode = models.CharField(verbose_name=_("Barcode"), max_length=255, unique=True)
     name = models.CharField(verbose_name=_("Name"), max_length=255, blank=True)
     price = MoneyField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -193,13 +180,10 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default_currency=settings.DEFAULT_CURRENCY,
         null=True,
-        blank=True
+        blank=True,
     )
     weight = MeasurementField(
-        measurement=Weight,
-        unit_choices=WeightUnits.CHOICES,
-        blank=True,
-        null=True,
+        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )
 
     images = models.ManyToManyField("ProductImage", through="VariantImage")
@@ -212,15 +196,49 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
         return self.name or self.sku
 
     def get_weight(self) -> "Weight":
-        return (
-            self.weight
-            or self.product.weight
-            or self.product.product_type.weight
-        )
+        return self.weight or self.product.weight or self.product.product_type.weight
 
     def get_first_image(self) -> "ProductImage":
         images = list(self.images.all())
         return images[0] if images else self.product.get_first_image()
+
+    @property
+    def available_stock(self):
+        val = self.stocks.aggregate(quantity=models.Sum("quantity"))
+        return val or 0
+
+    @property
+    def allocated(self):
+        return (
+            self.stocks.aggregate(
+                quantity=models.Sum("allocations__quantity_allocated")
+            )["quantity"]
+            or 0
+        )
+
+    @property
+    def needed_stock(self):
+        from assistant.orders.models import Order
+
+        val = self.order_lines.exclude(
+            order__status__in=[
+                Order.StatusChoices.FULFILLED,
+                Order.StatusChoices.CANCELED,
+            ]
+        ).aggregate(quantity=models.Sum("quantity"))
+        return val or 0
+
+    @property
+    def in_purchase(self):
+        from assistant.orders.models import Order
+
+        val = self.order_lines.exclude(
+            order__status__in=[
+                Order.StatusChoices.FULFILLED,
+                Order.StatusChoices.CANCELED,
+            ]
+        ).aggregate(quantity=models.Sum("purchase_order__quantity"))
+        return val or 0
 
 
 class ProductImage(Orderable, BaseModel):
@@ -228,15 +246,13 @@ class ProductImage(Orderable, BaseModel):
         Product, related_name="images", on_delete=models.CASCADE
     )
     image = models.ForeignKey(
-        'wagtailimages.Image',
+        "wagtailimages.Image",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+',
+        related_name="+",
     )
-    alt = models.CharField(
-        verbose_name=_("Image Alt Text"), max_length=128, blank=True
-    )
+    alt = models.CharField(verbose_name=_("Image Alt Text"), max_length=128, blank=True)
 
     class Meta:
         verbose_name = _("Product Image")
@@ -248,9 +264,7 @@ class ProductImage(Orderable, BaseModel):
 
 class VariantImage(models.Model):
     variant = models.ForeignKey(
-        "ProductVariant",
-        related_name="variant_images",
-        on_delete=models.CASCADE,
+        "ProductVariant", related_name="variant_images", on_delete=models.CASCADE,
     )
     image = models.ForeignKey(
         ProductImage, related_name="variant_images", on_delete=models.CASCADE

@@ -20,7 +20,7 @@ from .helpers import (
     PurchaseOrderPermissionHelper,
 )
 from .models import WebLinkOrder, WebLinkOrderItem, PurchaseOrder
-from .views import PurchaseOrderSubmitView, PurchaseOrderEditView
+from .views import PurchaseOrderReceiveView, PurchaseOrderEditView
 
 
 class WebLinkOrderWagtilAdmin(ModelAdmin):
@@ -87,24 +87,24 @@ class PurchaseOrderWagtailAdmin(ModelAdmin):
     permission_helper_class = PurchaseOrderPermissionHelper
     edit_template_name = "weblink_channel/modeladmin/edit.html"
     edit_view_class = PurchaseOrderEditView
-    submit_view_class = PurchaseOrderSubmitView
-    submit_view_extra_js = [
+    receive_view_class = PurchaseOrderReceiveView
+    receive_view_extra_js = [
         "wagtailadmin/js/modal-workflow.js",
-        "js/purchase-order-submit.js",
+        "js/purchase-order-receive.js",
     ]
-    submit_view_extra_css = []
+    receive_view_extra_css = []
 
     @cached_property
-    def submit_url(self):
-        return self.url_helper.get_action_url("submit", self.pk_quoted)
+    def receive_url(self):
+        return self.url_helper.get_action_url("receive", self.pk_quoted)
 
-    def get_submit_view_extra_js(self):
-        return self.submit_view_extra_js
+    def get_receive_view_extra_js(self):
+        return self.receive_view_extra_js
 
-    def get_submit_view_extra_css(self):
-        return self.submit_view_extra_css
+    def get_receive_view_extra_css(self):
+        return self.receive_view_extra_css
 
-    def submit_view(self, request, instance_pk):
+    def receive_view(self, request, instance_pk):
         """
         Instantiates a class-based view to provide 'edit' functionality for the
         assigned model, or redirect to Wagtail's edit view if the assigned
@@ -112,7 +112,7 @@ class PurchaseOrderWagtailAdmin(ModelAdmin):
         the  'edit_view_class' attribute.
         """
         kwargs = {"model_admin": self, "instance_pk": instance_pk}
-        view_class = self.submit_view_class
+        view_class = self.receive_view_class
         return view_class.as_view(**kwargs)(request)
 
     def get_admin_urls_for_registration(self):
@@ -138,9 +138,9 @@ class PurchaseOrderWagtailAdmin(ModelAdmin):
                 name=self.url_helper.get_action_url_name("delete"),
             ),
             re_path(
-                self.url_helper.get_action_url_pattern("submit"),
-                self.submit_view,
-                name=self.url_helper.get_action_url_name("submit"),
+                self.url_helper.get_action_url_pattern("receive"),
+                self.receive_view,
+                name=self.url_helper.get_action_url_name("receive"),
             ),
         )
         return urls
@@ -164,7 +164,7 @@ class WebLinkChannelWagtailAdminGroup(ModelAdminGroup):
     menu_label = _("Web Link Channel")
     menu_icon = "tag"
     menu_order = 200
-    items = (WebLinkOrderWagtilAdmin, WebLinkOrderItemWagtailAdmin)
+    items = (WebLinkOrderItemWagtailAdmin,)
 
 
 modeladmin_register(WebLinkChannelWagtailAdminGroup)

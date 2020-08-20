@@ -1,15 +1,17 @@
 import logging
 
 from django import forms
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from assistant.products.models import Supplier
-from .helpers import (
-    process_purchase_order,
+from assistant.weblink_channel.models import PurchaseOrder, PurchaseOrderItem
+from assistant.orders.models import Order, LineItem
+
+from assistant.purchases.services import (
     process_add_to_purchase_order,
-    process_receive_purchase_order_item,
+    process_purchase_order,
 )
-from .models import WebLinkOrderItem, PurchaseOrder, PurchaseOrderItem
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,7 @@ class PurchaseOrderAddForm(forms.Form):
     purchase_order = forms.UUIDField()
     add_type = forms.CharField()
 
-    def save(self, item: WebLinkOrderItem):
+    def save(self, item: LineItem):
         obj = process_add_to_purchase_order(item=item, **self.cleaned_data)
         return obj
 
@@ -32,15 +34,24 @@ class PurchaseOrderAddForm(forms.Form):
 
 
 class PurchaseOrderForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        variant = kwargs.pop("variant")
+        super().__init__(**kwargs)
+        self.fields["sales_orders"].queryset = LineItem.objects.filter(variant=variant)
+
     supplier = forms.CharField(label=_("Supplier"), required=False)
     system_supplier = forms.ModelChoiceField(
         label=_("Supplier"), queryset=Supplier.objects.all(), required=False
     )
     estimated_arrival = forms.IntegerField()
     quantity = forms.IntegerField()
+    sales_orders = forms.ModelMultipleChoiceField(
+        queryset=LineItem.objects.none(),
+        help_text=_("Press Ctrl when selecting multiple sales orders"),
+    )
 
-    def save(self, item: WebLinkOrderItem):
-        obj = process_purchase_order(item=item, **self.cleaned_data)
+    def save(self):
+        obj = process_purchase_order(**self.cleaned_data)
         return obj
 
     def clean(self):
@@ -50,20 +61,3 @@ class PurchaseOrderForm(forms.Form):
                 _("Invalid value: One of the Supplier Fields should be provided"),
                 code="invalid",
             )
-
-
-class PurchaseOrderItemReceiveForm(forms.Form):
-    quantity = forms.IntegerField()
-    missing = forms.IntegerField()
-
-    def save(self, item: PurchaseOrderItem):
-        if item.quantity < self.cleaned_data["quantity"]:
-            logger.debug(
-                f"Exception raised due to heigher received quantity for {item.guid}"
-            )
-            raise forms.ValidationError(
-                message=_("Quantity Received is more than ordered"), code="invalid",
-            )
-        obj = process_receive_purchase_order_item(item=item, **self.cleaned_data)
-        logger.debug(f"processing of {obj.guid} has been completed.")
-        return obj

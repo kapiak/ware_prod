@@ -123,15 +123,11 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
     )
 
     weight = MeasurementField(
-        measurement=Weight,
-        unit_choices=WeightUnits.CHOICES,
-        default=zero_weight,
+        measurement=Weight, unit_choices=WeightUnits.CHOICES, default=zero_weight,
     )
 
     status = models.CharField(
-        max_length=32,
-        default=StatusChoices.UNFULFILLED,
-        choices=StatusChoices.choices,
+        max_length=32, default=StatusChoices.UNFULFILLED, choices=StatusChoices.choices,
     )
     financial_status = models.CharField(
         verbose_name=_("Financial Status"),
@@ -190,11 +186,6 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
 
-    def save(self, **kwargs):
-        if self.cancel_reason:
-            # Deallocated the stock
-            pass
-
 
 class LineItem(index.Indexed, Orderable, BaseModel):
     """ """
@@ -212,6 +203,12 @@ class LineItem(index.Indexed, Orderable, BaseModel):
     quantity_fulfilled = models.IntegerField(
         validators=[MinValueValidator(0)], default=0
     )
+    purchase_order = models.ForeignKey(
+        "purchases.PurchaseOrderItem",
+        related_name="sales_orders",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
 
     @property
     def quantity_unfulfilled(self):
@@ -223,10 +220,10 @@ class LineItem(index.Indexed, Orderable, BaseModel):
 
     @property
     def requires(self):
-        return self.quantity - self.allocated['allocated']
+        return self.quantity - self.allocated["allocated"]
 
     def __str__(self):
-        return f"#{self.order.number} - {self.variant.sku} -> {self.quantity_unfulfilled}"
+        return f"Order: #{self.order.number} | Variant: {self.variant.name} | Quantity: {self.quantity_unfulfilled}"
 
 
 # class Fulfillment(index.Indexed, BaseModel):

@@ -1,12 +1,11 @@
 $(function () {
-  $(".recieve-button").on("click", function (e) {
+  $(".receive-button").on("click", function (e) {
     e.preventDefault();
     ModalWorkflow({
       url: this.getAttribute("href"),
-
       onload: {
         chooser: function (modal, jsonData) {
-          $("form.purchase-recieve", modal.body).on("submit", function (e) {
+          $("form.purchase-receive", modal.body).on("submit", function (e) {
             e.preventDefault();
             var formdata = new FormData(this);
             $.ajax({
@@ -23,7 +22,7 @@ $(function () {
         },
         invalid: function (modal, jsonData) {
           addMessage("error", "More than requested.");
-          $("form.purchase-recieve", modal.body).on("submit", function (e) {
+          $("form.purchase-receive", modal.body).on("submit", function (e) {
             e.preventDefault();
             var formdata = new FormData(this);
             $.ajax({
@@ -43,17 +42,6 @@ $(function () {
           modal.close();
         },
       },
-    });
-  });
-});
-
-$(function () {
-  $(".missing-button").on("click", function (e) {
-    e.preventDefault();
-    ModalWorkflow({
-      url: this.getAttribute("href"),
-
-      onload: {},
     });
   });
 });
