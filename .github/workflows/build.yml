@@ -7,7 +7,7 @@ on:
 
 env:
   REPO: "mrb101"
-  IMAGE: "safely"
+  IMAGE: "assistant"
   REGISTRY_HOSTNAME: docker.pkg.github.com
   GITHUB_SHA: ${{ github.sha }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
