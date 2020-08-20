@@ -83,7 +83,6 @@ def allocate_product_to_order(request: HttpRequest, guid: uuid.UUID) -> JsonResp
         form = SimpleAllocationForm(request.POST, variant=variant)
         if form.is_valid():
             items = form.save()
-            print(items)
             return render_modal_workflow(
                 request,
                 None,
@@ -107,8 +106,32 @@ def receive_product_stock(request: HttpRequest, guid: uuid.UUID) -> JsonResponse
         ~Q(sales_orders__order__status__in=[PurchaseOrderItem.StatusChoices.RECEIVED,]),
         Q(sales_orders__variant=variant),
     )
-    print(purchase_orders)
-    form = StockReceiveForm(variant=variant, purchase_orders=purchase_orders)
+    if request.method == "POST":
+        form = StockReceiveForm(
+            request.POST,
+            request.FILES,
+            variant=variant,
+            purchase_orders=purchase_orders,
+        )
+        if form.is_valid():
+            print("Yaaaay")
+            print(form)
+            return render_modal_workflow(
+                request, None, None, {"obj": variant}, json_data={"step": "received"}
+            )
+        print(form.errors)
+        return render_modal_workflow(
+            request,
+            None,
+            None,
+            {"obj": variant, "form": form},
+            json_data={"step": "chooser"},
+        )
+    form = StockReceiveForm(
+        variant=variant,
+        purchase_orders=purchase_orders,
+        initial={"product_variant": variant},
+    )
     return render_modal_workflow(
         request,
         "products/choosers/product_receive.html",

@@ -1,0 +1,60 @@
+name: Build The Images
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  REPO: "mrb101"
+  IMAGE: "safely"
+  REGISTRY_HOSTNAME: docker.pkg.github.com
+  GITHUB_SHA: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: act10ns/slack@v1
+        with:
+          status: starting
+        if: always()
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      # Build the Docker image
+      - name: Build Django
+        run: |
+          docker build \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/app:"$GITHUB_SHA" \
+            --file compose/production/django/Dockerfile \
+            "."
+
+      - name: Build AWS
+        run: |
+          docker build \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/aws:latest \
+            --file compose/production/aws/Dockerfile \
+            "."
+
+      - name: Build Traefik
+        run: |
+          docker build \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/traefik:latest \
+            --file compose/production/traefik/Dockerfile \
+            "."
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish Images
+        run: |
+          echo ${GITHUB_RUNNER_TOKEN} | docker login docker.pkg.github.com -u mrb101 --password-stdin
+          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/app:$GITHUB_SHA
+          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/aws:latest
+          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/traefik:latest
+
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+        if: always()

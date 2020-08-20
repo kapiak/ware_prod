@@ -63,8 +63,7 @@ class StockReceiveForm(forms.Form):
     product_variant = forms.ModelChoiceField(
         queryset=ProductVariant.objects.none(), widget=forms.HiddenInput()
     )
-    purchase_orders = forms.ModelMultipleChoiceField(
-        queryset=PurchaseOrderItem.objects.none()
-    )
+    purchase_orders = forms.ModelChoiceField(queryset=PurchaseOrderItem.objects.none())
     quantity = forms.IntegerField()
+    attachment = forms.FileField()
 
