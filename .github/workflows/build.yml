@@ -10,6 +10,7 @@ env:
   IMAGE: "safely"
   REGISTRY_HOSTNAME: docker.pkg.github.com
   GITHUB_SHA: ${{ github.sha }}
+  GH_TOKEN: ${{ GH_TOKEN }}
 
 jobs:
   build:
@@ -43,7 +44,7 @@ jobs:
       # Push the Docker image to Google Container Registry
       - name: Publish Images
         run: |
-          echo ${GITHUB_RUNNER_TOKEN} | docker login docker.pkg.github.com -u mrb101 --password-stdin
+          echo $GH_TOKEN | docker login docker.pkg.github.com -u mrb101 --password-stdin
           docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/app:$GITHUB_SHA
           docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/aws:latest
           docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/traefik:latest
