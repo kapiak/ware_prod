@@ -23,7 +23,7 @@ jobs:
       - name: Build Django
         run: |
           docker build \
-            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/app:"$GITHUB_SHA" \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/django:"$GITHUB_SHA" \
             --file compose/production/django/Dockerfile \
             "."
 
