@@ -23,21 +23,21 @@ jobs:
       - name: Build Django
         run: |
           docker build \
-            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/django:"$GITHUB_SHA" \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/assistant-django:"$GITHUB_SHA" \
             --file compose/production/django/Dockerfile \
             "."
 
       - name: Build AWS
         run: |
           docker build \
-            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/aws:latest \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/assistant-aws:latest \
             --file compose/production/aws/Dockerfile \
             "."
 
       - name: Build Traefik
         run: |
           docker build \
-            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/traefik:latest \
+            --tag "$REGISTRY_HOSTNAME"/"$REPO"/"$IMAGE"/assistant-traefik:latest \
             --file compose/production/traefik/Dockerfile \
             "."
 
@@ -45,6 +45,6 @@ jobs:
       - name: Publish Images
         run: |
           echo $GH_TOKEN | docker login docker.pkg.github.com -u mrb101 --password-stdin
-          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/django:$GITHUB_SHA
-          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/aws:latest
-          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/traefik:latest
+          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/assistant-django:$GITHUB_SHA
+          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/assistant-aws:latest
+          docker push $REGISTRY_HOSTNAME/$REPO/$IMAGE/assistant-traefik:latest
