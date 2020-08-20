@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 volumes:
   production_postgres_data: {}
@@ -47,6 +47,16 @@ services:
   redis:
     image: redis:5.0
 
+  broker:
+    image: rabbitmq:latest
+    hostname: broker
+    environment:
+      - RABBITMQ_DEFAULT_USER=debug
+      - RABBITMQ_DEFAULT_PASS=debug
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   celeryworker:
     <<: *django
     image: assistant_production_celeryworker
@@ -62,7 +72,6 @@ services:
     image: assistant_production_flower
     command: /start-flower
 
-  
   awscli:
     build:
       context: .
