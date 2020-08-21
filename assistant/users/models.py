@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from assistant.core.models import BaseModel
 
+
 class User(AbstractUser):
     """Default user for assistant.
     """
@@ -15,11 +16,23 @@ class User(AbstractUser):
     name = CharField(_("Name of User"), blank=True, max_length=255)
 
     shipping_address = models.ForeignKey(
-        "addresses.Address", related_name="+", null=True, blank=True, on_delete=models.SET_NULL
+        "addresses.Address",
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     billing_address = models.ForeignKey(
-        "addresses.Address", related_name="+", null=True, blank=True, on_delete=models.SET_NULL
+        "addresses.Address",
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
+
+    @property
+    def fullname(self):
+        return self.name or self.email
 
     def get_absolute_url(self):
         """Get url for user's detail view.

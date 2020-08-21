@@ -13,7 +13,7 @@ from sequences import get_next_value
 from assistant.addresses.models import Address
 from assistant.orders.models import LineItem, Order
 from assistant.products.models import Product, ProductType, ProductVariant
-from assistant.utils.helpers import generate_username
+from assistant.utils.helpers import get_random_string
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +34,20 @@ def process_order(**data) -> Order:
         postal_code=customer["code"],
     )
 
-    username = generate_username(customer["name"])
-
     if not User.objects.filter(email=customer["email"]):
         user = User.objects.create_user(
             name=customer["name"],
-            username=username,
+            username=customer["email"],
             email=customer["email"],
             password=customer["password"],
             shipping_address=address,
         )
 
     else:
-        raise ValidationError(message=_("Email Already Registered"), code=_("exists"))
+        raise ValidationError(
+            message=_("Email already registered please login to your account"),
+            code=_("exists"),
+        )
 
     order = Order.objects.create(
         number=get_next_value("order_number", initial_value=10000),
@@ -65,7 +66,7 @@ def process_order(**data) -> Order:
             product_type = ProductType.objects.create(name="Manual", slug="manual")
         product = Product.objects.create(
             title=item["name"],
-            slug=slugify(item["name"]),  # TODO: This will cause errors and need to fix
+            slug=get_random_string(20),  # TODO: This will cause errors and need to fix
             description=item["comments"],
             weight=Weight(kg=shipping["weight"]),
             max_price=item["price"],
@@ -73,8 +74,62 @@ def process_order(**data) -> Order:
         )
         variant = ProductVariant.objects.create(
             product=product,
-            sku=item["url"],  # TODO: Might Clash need to solve this.
-            barcode=item["url"],  # TODO: Might Clash need to solve this.
+            sku=get_random_string(20),  # TODO: Might Clash need to solve this.
+            barcode=get_random_string(30),  # TODO: Might Clash need to solve this.
+            name=item["name"],
+            price=item["price"],
+            weight=Weight(kg=shipping["weight"]),
+        )
+        LineItem.objects.create(
+            order=order,
+            variant=variant,
+            is_shipping_required=True,
+            quantity=item["quantity"],
+        )
+    return order
+
+
+@transaction.atomic
+def process_order_for_user(user, **data) -> Order:
+    customer = data.pop("customer")
+    shipping = data.pop("shipping")
+    items = data.pop("items")
+
+    address = Address.objects.create(
+        first_name=customer["name"],
+        city=customer["city"],
+        city_area=customer["state"],
+        country=customer["country"],
+        postal_code=customer["code"],
+    )
+
+    order = Order.objects.create(
+        number=get_next_value("order_number", initial_value=10000),
+        customer_email=user.email,
+        customer_id=user.pk,
+        total_price=100,
+        status=Order.StatusChoices.DRAFT,
+        type=Order.OrderType.DRAFT,
+        user=user,
+        billing_address=address,
+        shipping_address=address,
+    )
+    for item in items:
+        product_type = ProductType.objects.filter(slug="manual")
+        if not product_type.exists():
+            product_type = ProductType.objects.create(name="Manual", slug="manual")
+        product = Product.objects.create(
+            title=item["name"],
+            slug=get_random_string(20),  # TODO: This will cause errors and need to fix
+            description=item["comments"],
+            weight=Weight(kg=shipping["weight"]),
+            max_price=item["price"],
+            min_price=item["price"],
+        )
+        variant = ProductVariant.objects.create(
+            product=product,
+            sku=get_random_string(20),  # TODO: Might Clash need to solve this.
+            barcode=get_random_string(30),  # TODO: Might Clash need to solve this.
             name=item["name"],
             price=item["price"],
             weight=Weight(kg=shipping["weight"]),

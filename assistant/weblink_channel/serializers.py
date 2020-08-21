@@ -11,7 +11,16 @@ class ProductURLSerializer(serializers.Serializer):
 class CustomerSerializer(serializers.Serializer):
     name = serializers.CharField()
     email = serializers.EmailField()
-    password = serializers.CharField(style={'input_type': 'password'})
+    password = serializers.CharField(style={"input_type": "password"})
+    city = serializers.CharField()
+    state = serializers.CharField()
+    country = CountryField()
+    code = serializers.CharField()
+
+
+class UserCustomerSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    email = serializers.EmailField()
     city = serializers.CharField()
     state = serializers.CharField()
     country = CountryField()
@@ -36,5 +45,11 @@ class ProductCartSerializer(serializers.Serializer):
 
 class CartSerializer(serializers.Serializer):
     customer = CustomerSerializer()
+    shipping = ShippingSerializer()
+    items = ProductCartSerializer(many=True)
+
+
+class UserCartSerializer(serializers.Serializer):
+    customer = UserCustomerSerializer()
     shipping = ShippingSerializer()
     items = ProductCartSerializer(many=True)

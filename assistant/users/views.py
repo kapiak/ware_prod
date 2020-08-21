@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView
+from django.http import HttpRequest, JsonResponse
 
 from assistant.core.pub_sub import Publisher, Consumer
 from assistant.core.models import RemoteModel
@@ -65,3 +66,8 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
+
+def user_email_exists(request: HttpRequest, email: str) -> JsonResponse:
+    context = {"exists": User.objects.filter(email=email).exists()}
+    return JsonResponse(context)
