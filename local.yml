@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 volumes:
   local_postgres_data: {}
@@ -33,6 +33,20 @@ services:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups
     env_file:
+      - ./.envs/.local/.postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:5050"
+    depends_on:
+      - postgres
+    environment:
+      - PGADMIN_LISTEN_PORT=5050
+      - PGADMIN_DEFAULT_EMAIL=admin@bassel.xyz
+      - PGADMIN_DEFAULT_PASSWORD=test123
+    env_file:
+      - ./.envs/.local/.django
       - ./.envs/.local/.postgres
 
   # docs:

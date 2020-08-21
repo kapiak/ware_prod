@@ -24,7 +24,7 @@ class PurchaseOrderWagtailAdmin(ModelAdmin):
     menu_order = 200
     list_display = ("number", "status", "estimated_arrival", "supplier", "created_at")
     list_filter = ("status",)
-    edit_template_name = "weblink_channel/modeladmin/edit.html"
+    edit_template_name = "purchases/modeladmin/edit.html"
     receive_view_extra_css = []
 
     panels = [

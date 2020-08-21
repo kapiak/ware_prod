@@ -1,17 +1,21 @@
 from re import match
 
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Max, Sum
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator
-
-from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey
-from wagtail.search import index
-from wagtail.core.models import Orderable
 from django_measurement.models import MeasurementField
 from measurement.measures import Weight
+from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
+from sequences import get_next_value
+from wagtail.contrib.table_block.blocks import TableBlock
+from wagtail.core.blocks import StreamBlock
+from wagtail.core.fields import StreamField
+from wagtail.core.models import Orderable
+from wagtail.search import index
 
 from assistant.core.models import BaseModel
 
@@ -224,6 +228,74 @@ class LineItem(index.Indexed, Orderable, BaseModel):
 
     def __str__(self):
         return f"Order: #{self.order.number} | Variant: {self.variant.name} | Quantity: {self.quantity_unfulfilled}"
+
+
+class BatchOrderUpload(index.Indexed, Orderable, BaseModel):
+
+    order = ParentalKey(
+        Order, related_name="batches", on_delete=models.CASCADE, null=True
+    )
+    orders = StreamField(
+        [
+            (
+                "upload",
+                TableBlock(
+                    table_options={
+                        "minSpareRows": 0,
+                        "startRows": 1,
+                        "startCols": 9,
+                        "colHeaders": True,
+                        "rowHeaders": False,
+                        "contextMenu": True,
+                        "editor": "text",
+                        "stretchH": "all",
+                        "height": 216,
+                        "language": "en",
+                        "renderer": "text",
+                        "autoColumnSize": False,
+                    }
+                ),
+            )
+        ]
+    )
+
+    class Meta:
+        verbose_name = _("Batch Order Upload")
+        verbose_name_plural = _("Batch Orders Upload")
+
+    def clean(self):
+        for data in self.orders.stream_data:
+            field, values, opts = data
+            print(opts)
+            rows = values.get("data")
+            iterator = iter(rows)
+            is_first_row_headers = values.get("first_row_is_table_header")
+            if is_first_row_headers:
+                next(iterator)
+            keys = [
+                "link",
+                "product",
+                "quantity",
+                "price",
+                "paid",
+                "total_price",
+                "date",
+            ]
+            for row in rows:
+                line_item = dict(zip(keys, row))
+                if None in line_item.values():
+                    raise ValidationError(_("Data is not good"))
+                LineItem.objects.create(**line_item)
+
+    def save(self, **kwargs):
+        self.clean()
+        if not self.order:
+            order = Order.objects.create(
+                number=get_next_value("order_number", initial_value=10000)
+            )
+            self.order = order
+
+        return super().save(**kwargs)
 
 
 # class Fulfillment(index.Indexed, BaseModel):

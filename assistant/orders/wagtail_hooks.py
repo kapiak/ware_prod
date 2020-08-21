@@ -4,6 +4,7 @@ from wagtail.admin.edit_handlers import (
     InlinePanel,
     MultiFieldPanel,
     ObjectList,
+    StreamFieldPanel,
     TabbedInterface,
 )
 from wagtail.contrib.modeladmin.options import (
@@ -13,7 +14,7 @@ from wagtail.contrib.modeladmin.options import (
 )
 
 from .helpers import OrderButtonHelper, OrderPermissionHelper, OrderUrlHelper
-from .models import LineItem, Order
+from .models import BatchOrderUpload, LineItem, Order
 
 
 class OrderWagtailAdmin(ModelAdmin):
@@ -61,19 +62,34 @@ class OrderWagtailAdmin(ModelAdmin):
             label=_("Line Items"),
         )
     ]
+    batch_panel = [
+        InlinePanel("batches", [StreamFieldPanel("orders"),], label=_("Batch"))
+    ]
     edit_handler = TabbedInterface(
         [
             ObjectList(panels, heading=_("Main")),
             ObjectList(lines_panels, heading=_("Line Items")),
+            ObjectList(batch_panel, heading=_("Batch Upload Line Items")),
         ]
     )
+
+
+class BatchOrderUploadWagtailAdmin(ModelAdmin):
+    model = BatchOrderUpload
+    menu_label = _("Batch Order")
+    menu_icon = "tag"
+    menu_order = 100
+
+    panels = [
+        StreamFieldPanel("orders"),
+    ]
 
 
 class OrderWagtailAdminGroup(ModelAdminGroup):
     menu_label = _("Orders")
     menu_icon = "list-ul"
     menu_order = 200
-    items = (OrderWagtailAdmin,)
+    items = (OrderWagtailAdmin, BatchOrderUploadWagtailAdmin)
 
 
 modeladmin_register(OrderWagtailAdminGroup)
