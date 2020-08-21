@@ -24,6 +24,6 @@ urlpatterns = [
     path(
         "customer-orders/new/",
         CustomerOrderCreate.as_view(),
-        name="customer_order_detail",
+        name="customer_order_create",
     ),
 ]
