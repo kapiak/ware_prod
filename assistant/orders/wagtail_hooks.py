@@ -41,11 +41,7 @@ class OrderWagtailAdmin(ModelAdmin):
         FieldPanel("status"),
         FieldPanel("closed_at"),
         MultiFieldPanel(
-            [
-                FieldPanel("total_price"),
-                FieldPanel("subtotal_price"),
-                FieldPanel("total_tax"),
-            ],
+            [FieldPanel("total_price"), FieldPanel("subtotal_price"),],
             heading=_("Price Details"),
         ),
         MultiFieldPanel(

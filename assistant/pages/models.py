@@ -12,16 +12,16 @@ class HomePage(Page):
     hero_image = models.ForeignKey(
         "wagtailimages.Image",
         related_name="+",
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         help_text=_("The image which shows in the hero header of the page."),
     )
     hero_tagline = models.CharField(
         verbose_name=_("Hero Tagline"),
         max_length=200,
         blank=True,
-        help_text=_(
-            "The tag line which appears on the top part of the hero image."
-        ),
+        help_text=_("The tag line which appears on the top part of the hero image."),
     )
     hero_main_text = models.CharField(
         verbose_name=_("Hero Main Text"),
@@ -42,9 +42,9 @@ class HomePage(Page):
 
     content_panels = Page.content_panels + [
         ImageChooserPanel("hero_image"),
-        FieldPanel('hero_tagline'),
-        FieldPanel('hero_main_text'),
-        FieldPanel('hero_subtext'),
+        FieldPanel("hero_tagline"),
+        FieldPanel("hero_main_text"),
+        FieldPanel("hero_subtext"),
     ]
 
     def _str__(self):
