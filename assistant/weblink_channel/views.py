@@ -6,19 +6,24 @@ import uuid
 import aiohttp
 import requests
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from wagtail.admin import messages
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.contrib.modeladmin.views import EditView, InstanceSpecificView
 
+from assistant.orders.models import Order
 from assistant.orders.services import process_order
 
 from .forms import PurchaseOrderAddForm, PurchaseOrderForm, PurchaseOrderItemReceiveForm
@@ -33,6 +38,9 @@ from .models import PurchaseOrder, PurchaseOrderItem, WebLinkOrderItem
 from .serializers import CartSerializer, ProductURLSerializer
 
 logger = logging.getLogger(__name__)
+
+
+User = get_user_model()
 
 
 @transaction.non_atomic_requests
@@ -76,6 +84,18 @@ def get_product_by_link_sync(request: HttpRequest) -> JsonResponse:
         {"message": _("This endpoint accepts POST requests only.")},
         status=status.HTTP_405_METHOD_NOT_ALLOWED,
     )
+
+
+class CustomerOrderList(LoginRequiredMixin, ListView):
+    template_name = "weblink_channel/orders/list.html"
+    queryset = Order.objects.all()
+    context_object_name = "orders"
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(user=self.request.user)
+        return qs
 
 
 def checkout(request: HttpRequest) -> JsonResponse:

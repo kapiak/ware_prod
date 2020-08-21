@@ -13,6 +13,7 @@ from sequences import get_next_value
 from assistant.addresses.models import Address
 from assistant.orders.models import LineItem, Order
 from assistant.products.models import Product, ProductType, ProductVariant
+from assistant.utils.helpers import generate_username
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ def process_order(**data) -> Order:
     customer = data.pop("customer")
     shipping = data.pop("shipping")
     items = data.pop("items")
+
     address = Address.objects.create(
         first_name=customer["name"],
         city=customer["city"],
@@ -31,22 +33,21 @@ def process_order(**data) -> Order:
         country=customer["country"],
         postal_code=customer["code"],
     )
-    username = slugify(customer["name"])
-    if User.objects.filter(username=username).exists():
-        random_string = "".join(
-            [random.choice(string.ascii_letters + string.digits) for n in range(5)]
-        )
-        username = username + random_string
+
+    username = generate_username(customer["name"])
+
     if not User.objects.filter(email=customer["email"]):
         user = User.objects.create_user(
             name=customer["name"],
-            username=slugify(username),
+            username=username,
             email=customer["email"],
             password=customer["password"],
             shipping_address=address,
         )
+
     else:
         raise ValidationError(message=_("Email Already Registered"), code=_("exists"))
+
     order = Order.objects.create(
         number=get_next_value("order_number", initial_value=10000),
         customer_email=user.email,

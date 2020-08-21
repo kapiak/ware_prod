@@ -6,6 +6,7 @@ from .views import (
     checkout,
     add_to_purchase_order,
     mark_purchase_item_received,
+    CustomerOrderList,
 )
 
 app_name = "weblink_channel"
@@ -24,4 +25,5 @@ urlpatterns = [
         mark_purchase_item_received,
         name="mark_purchase_item_received",
     ),
+    path("customer-orders/", CustomerOrderList.as_view(), name="customer_order_list"),
 ]

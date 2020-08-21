@@ -10,7 +10,9 @@
 
   <meta property="og:title" content="{{ page.title }}">
   <meta property="og:type" content="">
-  <meta property="og:url" content="{% pageurl page %}">
+  {% comment %}
+  <!-- <meta property="og:url" content="{% pageurl page %}"> -->
+  {% endcomment %}
   <meta property="og:image" content="">
 
   <link rel="apple-touch-icon" href="icon.png">
@@ -19,7 +21,7 @@
 
 </head>
 <body{% block body_class%}{% endblock body_class %}>
-  <div class="container mx-auto px-4">
+  <div class="mx-auto px-4">
   {% include 'pages/includes/header.html' %}
   {% block body %}{% endblock body %}
   </div>
