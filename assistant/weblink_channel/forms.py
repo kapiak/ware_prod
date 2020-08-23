@@ -8,7 +8,7 @@ class CustomerInformationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
-                "v-model": "cart.customer.email",
+                "v-model": "form.customer_form.email",
             }
         )
     )
@@ -16,7 +16,7 @@ class CustomerInformationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
-                "v-model": "cart.customer.name",
+                "v-model": "form.customer_form.name",
             }
         )
     )
@@ -24,7 +24,7 @@ class CustomerInformationForm(forms.Form):
         widget=forms.Select(
             attrs={
                 "class": "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-                "v-model": "cart.customer.country",
+                "v-model": "form.customer_form.country",
             }
         )
     )
@@ -32,7 +32,7 @@ class CustomerInformationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
-                "v-model": "cart.customer.state",
+                "v-model": "form.customer_form.state",
             }
         )
     )
@@ -40,42 +40,42 @@ class CustomerInformationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
-                "v-model": "cart.customer.city",
+                "v-model": "form.customer_form.city",
             }
         )
     )
-    postal_code = forms.CharField(
+    code = forms.CharField(
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
-                "v-model": "cart.customer.code",
+                "v-model": "form.customer_form.code",
             }
         )
     )
 
 
 class ShippingInformationForm(forms.Form):
-    shipping_method = forms.ChoiceField(
+    method = forms.ChoiceField(
         choices=[("DHL", _("DHL")), ("FEDEX", _("FedEx")), ("USPS", _("USPS"))],
         widget=forms.Select(
             attrs={
                 "class": "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
-                "v-model": "cart.shipping.method",
+                "v-model": "form.shipping_form.method",
             }
         ),
     )
-    total_weight = forms.DecimalField(
+    weight = forms.DecimalField(
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
-                "v-model": "cart.shipping.weight",
+                "v-model": "form.shipping_form.weight",
             }
         )
     )
 
 
 class ProductAddForm(forms.Form):
-    link = forms.URLField(
+    url = forms.URLField(
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",
@@ -99,7 +99,7 @@ class ProductAddForm(forms.Form):
             }
         )
     )
-    unite_price = forms.DecimalField(
+    price = forms.DecimalField(
         widget=forms.TextInput(
             attrs={
                 "class": "bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal",

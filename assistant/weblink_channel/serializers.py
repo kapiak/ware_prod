@@ -43,12 +43,12 @@ class ProductCartSerializer(serializers.Serializer):
 
 
 class CartSerializer(serializers.Serializer):
-    customer = CustomerSerializer()
-    shipping = ShippingSerializer()
-    items = ProductCartSerializer(many=True)
+    customer_form = CustomerSerializer()
+    shipping_form = ShippingSerializer()
+    product_add_formset = ProductCartSerializer(many=True)
 
 
 class UserCartSerializer(serializers.Serializer):
-    customer = UserCustomerSerializer()
-    shipping = ShippingSerializer()
-    items = ProductCartSerializer(many=True)
+    customer_form = UserCustomerSerializer()
+    shipping_form = ShippingSerializer()
+    product_add_formset = ProductCartSerializer(many=True)

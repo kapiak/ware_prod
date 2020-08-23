@@ -12,6 +12,7 @@ aiohttp = "3.6.2"
 extruct = "^0.9.0"
 django-sequences = "^2.5"
 crispy-tailwind = "^0.2.0"
+django-widget-tweaks = "^1.4.8"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

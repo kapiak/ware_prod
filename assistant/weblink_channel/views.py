@@ -17,7 +17,11 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.request import Request
+from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
+from rest_framework.views import APIView
 from wagtail.admin import messages
 from wagtail.admin.modal_workflow import render_modal_workflow
 
@@ -134,3 +138,31 @@ def checkout(request: HttpRequest) -> JsonResponse:
             serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
     return JsonResponse({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(["POST"])
+def checkout_api_view(request: HttpRequest) -> Response:
+    data = request.data.copy()
+    serializer_class = CartSerializer()
+    if request.user.is_authenticated:
+        serializer_class = UserCartSerializer
+        data["customer_form"].update(
+            {"name": request.user.fullname, "email": request.user.email}
+        )
+        serializer = serializer_class(data=data)
+        if serializer.is_valid():
+            process_order_for_user(user=request.user, **serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    serializer = serializer_class(data=data)
+    if serializer.is_valid():
+        try:
+            process_order(**serializer.data)
+        except ValidationError as eae:
+            return Response(
+                {"message": eae.message, "code": eae.code},
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+

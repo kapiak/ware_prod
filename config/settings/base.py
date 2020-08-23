@@ -96,6 +96,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "flags",
     "djmoney",
+    "widget_tweaks",
     "sequences.apps.SequencesConfig",
     # "django_countries",
     "health_check",  # required

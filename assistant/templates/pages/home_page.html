@@ -1,13 +1,17 @@
 {% extends 'pages/base.html' %}
-{% load i18n wagtailcore_tags %}
+{% load static i18n wagtailcore_tags %}
 
 {% block extra_css %}
 {% endblock extra_css%}
 
 {% block body %}
+
 {% include 'pages/includes/header.html' %}
+
 {% include_block page.content %}
+
 {% include "pages/checkout/index.html" %}
+
 {% endblock body %}
 
 {% block vue_app %}
@@ -16,81 +20,12 @@
       timeout: 1000,
       headers: {'X-CSRFTOKEN': '{{ csrf_token }}'}
     });
-
-    new Vue({
-      el: '#app',
-      data: {
-        userEmailExists: false,
-        cart: {
-          customer: {
-            name: '',
-            email: '',
-            city: '',
-            state: '',
-            country: '',
-            code: '',
-          },
-          shipping: {
-            method: '',
-            weight: 0,
-          },
-          items: [
-            {
-              url: '',
-              name: '',
-              quantity: 0,
-              price: 0,
-              comments: ''
-            }
-          ]
-        }
-      },
-      methods: {
-        addProduct: function() {
-          this.cart.items.push({
-            url: '',
-            name: '',
-            quantity: 0,
-            price: 0,
-            comments: ''
-          })
-        },
-        removeProduct: function(index) {
-          this.cart.items.splice(index, 1)
-        },
-        checkout: function() {
-          http.post(
-            "{% url 'weblink_channel:checkout' %}",
-            this.cart
-          )
-            .then(res => {
-              window.location.href = "/weblink-channel/customer-orders/"
-            })
-            .catch(err => console.log(err))
-        }
-      },
-      computed: {
-        user_email() {
-          return this.cart.customer.email
-        }
-      },
-      watch: {
-        user_email(val) {
-          http.get(
-            `/users/exists/${this.user_email}`
-          )
-          .then(res => {
-            console.log(res.data)
-            if (res.data.exists == true) {
-              console.log("True")
-              this.userEmailExists = true
-            } else {
-              this.userEmailExists = false
-            }
-          })
-          .catch(err => console.log(err))
-        }
-      }
-    })
+    const csrfToken = "{{ csrf_token }}";
+    const checkoutURL = "{% url 'weblink_channel:checkout' %}"
+    const successURL = "{% url 'weblink_channel:customer_order_list' %}"
+    const checkout = "{% url 'weblink_channel:checkout' %}"
+    const checkoutAPI = "{% url 'weblink_channel:checkout-api-view' %}"
   </script>
+  <script src="{% static 'js/checkout.js' %}"></script>
+
 {% endblock vue_app %}

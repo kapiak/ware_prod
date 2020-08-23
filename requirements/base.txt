@@ -40,6 +40,7 @@ django-versatileimagefield==2.0  # https://github.com/respondcreate/django-versa
 django-ipware==3.0.1  # https://github.com/un33k/django-ipware
 django-sequences==2.5  # https://github.com/aaugustin/django-sequences
 crispy-tailwind==0.2.0  # https://github.com/django-crispy-forms/crispy-tailwind
+django-widget-tweaks==1.4.8  # https://github.com/jazzband/django-widget-tweaks
 
 # Django REST Framework
 djangorestframework==3.11.1  # https://github.com/encode/django-rest-framework

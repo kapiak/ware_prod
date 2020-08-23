@@ -187,6 +187,14 @@ django = ">=2.2"
 
 [[package]]
 category = "main"
+description = "Tweak the form field rendering in templates, not in python-level form definitions."
+name = "django-widget-tweaks"
+optional = false
+python-versions = "*"
+version = "1.4.8"
+
+[[package]]
+category = "main"
 description = "Extract embedded metadata from HTML markup"
 name = "extruct"
 optional = false
@@ -583,7 +591,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "dab9bd67008f14de542847ae1a9eed88db2a7ab95d2cd9e6e3c1cb3c2727736b"
+content-hash = "e0a501c213fbb8e518a76a2e0a457de7ab653ae01f6c27dc5355ec4d6f0c7eb4"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -662,6 +670,10 @@ django-crispy-forms = [
 django-sequences = [
     {file = "django-sequences-2.5.tar.gz", hash = "sha256:1617606c9289b9f4da5e7c23c1ef57c68888bd6b77fda6e7927522a11d0b3471"},
     {file = "django_sequences-2.5-py3-none-any.whl", hash = "sha256:2341d962ed35ef73755e1865dc9fee00fbde77d0200ed4057344793adcef29b6"},
+]
+django-widget-tweaks = [
+    {file = "django-widget-tweaks-1.4.8.tar.gz", hash = "sha256:9f91ca4217199b7671971d3c1f323a2bec71a0c27dec6260b3c006fa541bc489"},
+    {file = "django_widget_tweaks-1.4.8-py2.py3-none-any.whl", hash = "sha256:f80bff4a8a59b278bb277a405a76a8b9a884e4bae7a6c70e78a39c626cd1c836"},
 ]
 extruct = [
     {file = "extruct-0.9.0-py2.py3-none-any.whl", hash = "sha256:4df0ed2c58216f5b4ab1dd8bf727a808f5fa71040c0f58d39f7074230b1e1289"},

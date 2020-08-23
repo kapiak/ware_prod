@@ -91,9 +91,9 @@ def process_order(**data) -> Order:
 
 @transaction.atomic
 def process_order_for_user(user, **data) -> Order:
-    customer = data.pop("customer")
-    shipping = data.pop("shipping")
-    items = data.pop("items")
+    customer = data.pop("customer_form")
+    shipping = data.pop("shipping_form")
+    items = data.pop("product_add_formset")
 
     address = Address.objects.create(
         first_name=customer["name"],

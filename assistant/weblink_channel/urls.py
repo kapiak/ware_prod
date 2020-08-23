@@ -7,6 +7,7 @@ from .views import (
     CustomerOrderList,
     CustomerOrderDetail,
     CustomerOrderCreate,
+    checkout_api_view,
 )
 
 app_name = "weblink_channel"
@@ -15,6 +16,7 @@ urlpatterns = [
     path("scrape/", get_product_by_link, name="get_product_by_link"),
     path("sync-scrape/", get_product_by_link_sync, name="get_product_by_link_sync",),
     path("checkout/", checkout, name="checkout"),
+    path("checkout-api/", checkout_api_view, name="checkout-api-view"),
     path("customer-orders/", CustomerOrderList.as_view(), name="customer_order_list"),
     path(
         "customer-orders/<uuid:guid>/",

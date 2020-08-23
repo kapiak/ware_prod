@@ -13,6 +13,7 @@ from assistant.weblink_channel.forms import (
     ProductAddForm,
     ShippingInformationForm,
 )
+from assistant.utils.forms import VueBaseFormSet
 
 
 class ColorChoices(models.TextChoices):
@@ -199,7 +200,9 @@ class HomePage(Page):
             {
                 "customer_form": CustomerInformationForm(),
                 "shipping_form": ShippingInformationForm(),
-                "product_add_formset": formset_factory(ProductAddForm),
+                "product_add_formset": formset_factory(
+                    ProductAddForm, formset=VueBaseFormSet
+                ),
             }
         )
         return context
