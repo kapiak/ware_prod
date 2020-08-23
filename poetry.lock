@@ -140,6 +140,17 @@ version = "0.4.3"
 
 [[package]]
 category = "main"
+description = "A tailwind package for Django Crispy Forms"
+name = "crispy-tailwind"
+optional = false
+python-versions = ">=3.5"
+version = "0.2.0"
+
+[package.dependencies]
+django-crispy-forms = ">=1.9.0"
+
+[[package]]
+category = "main"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 name = "django"
 optional = false
@@ -154,6 +165,14 @@ sqlparse = ">=0.2.2"
 [package.extras]
 argon2 = ["argon2-cffi (>=16.1.0)"]
 bcrypt = ["bcrypt"]
+
+[[package]]
+category = "main"
+description = "Best way to have Django DRY forms"
+name = "django-crispy-forms"
+optional = false
+python-versions = ">=3.5"
+version = "1.9.2"
 
 [[package]]
 category = "main"
@@ -564,7 +583,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "2f1e18fa939ea96a84565184272e81db288124f58068b9f168b4952d4af5eece"
+content-hash = "dab9bd67008f14de542847ae1a9eed88db2a7ab95d2cd9e6e3c1cb3c2727736b"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -628,9 +647,17 @@ colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
 ]
+crispy-tailwind = [
+    {file = "crispy-tailwind-0.2.0.tar.gz", hash = "sha256:780434efbd3a63064b7c19c36dc722ac01e6bbb8a7e53a6f4f39daf310ae7388"},
+    {file = "crispy_tailwind-0.2.0-py3-none-any.whl", hash = "sha256:874d2777e9bc323b0af920be4346a8ed971954c2055ba636790808ad0c188421"},
+]
 django = [
     {file = "Django-3.1-py3-none-any.whl", hash = "sha256:1a63f5bb6ff4d7c42f62a519edc2adbb37f9b78068a5a862beff858b68e3dc8b"},
     {file = "Django-3.1.tar.gz", hash = "sha256:2d390268a13c655c97e0e2ede9d117007996db692c1bb93eabebd4fb7ea7012b"},
+]
+django-crispy-forms = [
+    {file = "django-crispy-forms-1.9.2.tar.gz", hash = "sha256:f2f1e0fbb458851636447cfb6be1a611b40c8ac9e41a74ba923011378670b43b"},
+    {file = "django_crispy_forms-1.9.2-py3-none-any.whl", hash = "sha256:888bb316db89b60050a42ec35080facb361d823eec38010ccb0702f45642d3b8"},
 ]
 django-sequences = [
     {file = "django-sequences-2.5.tar.gz", hash = "sha256:1617606c9289b9f4da5e7c23c1ef57c68888bd6b77fda6e7927522a11d0b3471"},

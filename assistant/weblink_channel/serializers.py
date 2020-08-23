@@ -11,7 +11,6 @@ class ProductURLSerializer(serializers.Serializer):
 class CustomerSerializer(serializers.Serializer):
     name = serializers.CharField()
     email = serializers.EmailField()
-    password = serializers.CharField(style={"input_type": "password"})
     city = serializers.CharField()
     state = serializers.CharField()
     country = CountryField()

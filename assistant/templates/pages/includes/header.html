@@ -1,22 +1,26 @@
-{% load i18n %}
+{% load wagtailimages_tags %}
 
-<header class="text-gray-700 body-font">
-  <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-    <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full" viewBox="0 0 24 24">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-      </svg>
-      <span class="ml-3 text-xl">{% trans 'Harumio' %}</span>
-    </a>
-    <nav class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-      <a class="mr-5 hover:text-gray-900">{% trans 'About us' %}</a>
-      <a class="mr-5 hover:text-gray-900">{% trans 'Popular' %}</a>
-    </nav>
-    <button class="inline-flex items-center bg-gray-200 border-0 py-1 px-3 focus:outline-none hover:bg-gray-300 rounded text-base mt-4 md:mt-0">
-      {% trans 'Login' %}
-      <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-1" viewBox="0 0 24 24">
-        <path d="M5 12h14M12 5l7 7-7 7"></path>
-      </svg>
-    </button>
+<div class="relative pt-16 pb-32 flex content-center items-center justify-center" style="min-height: 75vh;">
+  {% image page.hero_image width-400 format-webp as bg_image %}
+  <div
+    class="absolute top-0 w-full h-full bg-center bg-cover"
+    style="background-image: url('{{ bg_image.url }}');"
+  >
+    <span id="blackOverlay" class="w-full h-full absolute opacity-50 bg-black"></span>
   </div>
-</header>
+  <div class="container relative mx-auto">
+    <div class="items-center flex flex-wrap">
+      <div class="w-full lg:w-6/12 px-4 ml-auto mr-auto text-center">
+        <div class="pr-12">
+          <h1 class="text-white font-semibold text-5xl">{{ page.hero_main_text }}</h1>
+          <p class="mt-4 text-lg text-gray-300">{{ page.hero_subtext }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden" style="height: 70px; transform: translateZ(0);">
+    <svg class="absolute bottom-0 overflow-hidden" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" version="1.1" viewBox="0 0 2560 100" x="0" y="0">
+      <polygon class="text-gray-300 fill-current" points="2560 0 2560 100 0 100"></polygon>
+    </svg>
+  </div>
+</div>

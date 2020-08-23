@@ -107,7 +107,6 @@ class CustomerOrderCreate(LoginRequiredMixin, TemplateView):
 def checkout(request: HttpRequest) -> JsonResponse:
     if request.method == "POST":
         data = JSONParser().parse(request)
-
         serializer_class = CartSerializer()
         if request.user.is_authenticated:
             serializer_class = UserCartSerializer

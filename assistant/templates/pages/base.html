@@ -21,9 +21,10 @@
 
 </head>
 <body{% block body_class%}{% endblock body_class %}>
-  <div class="mx-auto px-4">
-  {% include 'pages/includes/header.html' %}
-  {% block body %}{% endblock body %}
+  <div class="mx-auto">
+  {% include 'pages/includes/navbar.html' %}
+  {% block body %}{% endblock body %}  
+  {% include 'pages/includes/footer.html' %}
   </div>
   <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

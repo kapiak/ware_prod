@@ -1,0 +1,9 @@
+{% load wagtailcore_tags %}
+
+<section class="relative py-20 {{ value.background_color }}">
+    <div class="container mx-auto px-4">
+        <div class="items-center flex flex-col flex-wrap {{ value.text_color }}">
+            {{ value.column }}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,11 @@
+<button class="text-pink-500 background-transparent font-bold uppercase px-8 py-3 outline-none focus:outline-none mr-1 mb-1" 
+        type="{{ type }}" 
+        style="transition: all .15s ease">
+  {% if icon %}
+    <i class="fas fa-{{ icon }}"></i>
+  {% endif %}
+
+  {% if text %}
+    {{ text }}
+  {% endif %}
+</button>

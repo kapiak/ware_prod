@@ -1,0 +1,11 @@
+<button class="bg-{{ color }}-500 text-white active:bg-pink-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1" 
+        type="{{ type }}" 
+        style="transition: all .15s ease">
+  {% if icon %}
+    <i class="fas fa-{{ icon }}"></i>
+  {% endif %}
+
+  {% if text %}
+    {{ text }}
+  {% endif %}
+</button>

@@ -1,0 +1,12 @@
+{% load wagtailimages_tags %}
+
+<div class="flex flex-wrap justify-center text-center mb-24">
+    <div class="{{ value.background_color }} shadow-lg rounded-lg text-center p-8">
+        {% image value.image width-400 format-webp as card_image %}
+        <img alt="{{ card_image.alt }}" 
+            src="{{ card_image.url }}" 
+            class="shadow-md rounded-full max-w-full w-16 mx-auto p-2 bg-white">
+        <p class="text-lg {{ value.text_color }} mt-4 font-semibold">{{ value.heading }}</p>
+        <p class="text-base {{ value.text_color }} opacity-75 mt-2">{{ value.paragraph }}</p>
+    </div>
+</div>

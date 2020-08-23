@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<form id="app" method="POST" action="#" class="py-5">
+    {% csrf_token %}
+    <div class="container mx-auto flex justify-between">
+        <div class="w-2/6">
+            <div class="shadow-xl rounded-lg py-16 px-12">
+                {{ customer_form.as_p }}
+                {{ shipping_form.as_p }}
+            </div>
+        </div>
+        <div class="w-4/6">
+            <div class="shadow-xl rounded-lg py-16 px-12">
+                <h1 class="font-semibold text-3xl">Cart: </h1>
+                {{ product_add_formset.management_form }}
+                {% for form in product_add_formset %}
+                <div class="formset-form" v-for="item, index in cart.items" :key="index">
+                    {{ form }}
+                    <button @click="removeProduct" class="mt-2 appearance-none bg-gray-200 text-red-900 px-3 py-1 shadow-sm border border-red-400 mb-5 rounded-md" type="button">{% trans 'Remove this product' %}</button>
+                </div>
+                {% endfor %}
+                <div class="flex justify-end">
+                    <button @click="addProduct" class="mt-2 appearance-none bg-gray-200 text-green-900 px-2 py-1 shadow-sm border border-green-400 rounded-md mr-3" type="button">{% trans 'Add Another Product' %}</button>
+                </div>
+                <div class="flex justify-end">
+                    <button @click.prevent="checkout" class="mt-6 appearance-none bg-gray-200 text-blue-900 px-2 py-1 shadow-sm border border-blue-400 rounded-md mr-3" type="submit">{% trans 'Submit Order' %}</button>
+                </div>
+             </div>
+        </div>
+    </div>
+</form>
