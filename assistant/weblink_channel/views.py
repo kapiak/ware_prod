@@ -95,7 +95,7 @@ class CustomerOrderList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
         qs = qs.filter(user=self.request.user)
-        return qs
+        return qs.order_by("-created_at")
 
 
 class CustomerOrderDetail(LoginRequiredMixin, DetailView):
