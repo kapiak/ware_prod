@@ -3,6 +3,7 @@ const app = new Vue({
   delimiters: ["${", "}"],
   data: {
     userEmailExists: false,
+    errors: [],
     totalForms: 1,
     initialForms: 0,
     minNumForms: 0,
