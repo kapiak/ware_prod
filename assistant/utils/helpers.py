@@ -5,6 +5,9 @@ import string
 import requests
 from django.contrib.auth.models import User
 from django.db.models import CharField, Value
+from django_countries import countries
+from django_countries.fields import Country
+from geolite2 import geolite2
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -57,6 +60,17 @@ def combined_recent(limit, **kwargs):
     for record in records:
         record["object"] = fetched[(record["type"], record["pk"])]
     return records
+
+
+def get_country_by_ip(ip):
+    reader = geolite2.reader()
+    geo_data = reader.get(ip)
+    geolite2.close()
+    if geo_data and "country" in geo_data and "iso_code" in geo_data["country"]:
+        country_iso_code = geo_data["country"]["iso_code"]
+        if country_iso_code in countries:
+            return Country(country_iso_code)
+    return None
 
 
 # class TimeoutHTTPAdapter(HttpAdapter):

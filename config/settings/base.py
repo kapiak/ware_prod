@@ -98,7 +98,7 @@ THIRD_PARTY_APPS = [
     "djmoney",
     "widget_tweaks",
     "sequences.apps.SequencesConfig",
-    # "django_countries",
+    "django_countries",
     "health_check",  # required
     "health_check.db",  # stock Django health checkers
     "health_check.cache",
