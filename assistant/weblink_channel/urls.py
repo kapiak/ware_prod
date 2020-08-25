@@ -7,6 +7,8 @@ from .views import (
     CustomerOrderList,
     CustomerOrderDetail,
     CustomerOrderCreate,
+    CustomerProductVariantListView,
+    CustomerProductVariantDetailView,
     checkout_api_view,
 )
 
@@ -27,5 +29,15 @@ urlpatterns = [
         "customer-orders/new/",
         CustomerOrderCreate.as_view(),
         name="customer_order_create",
+    ),
+    path(
+        "customer-products/",
+        CustomerProductVariantListView.as_view(),
+        name="customer_product_list",
+    ),
+    path(
+        "customer-products/<uuid:guid>/",
+        CustomerProductVariantDetailView.as_view(),
+        name="customer_product_detail",
     ),
 ]

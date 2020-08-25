@@ -38,15 +38,30 @@
             <ul>
                 <!-- Items Section -->
                 <li class="hover:bg-gray-100">
-                    <a href="." class="h-16 px-6 flex flex justify-center items-center w-full focus:text-orange-500">
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="{% url 'weblink_channel:customer_order_list' %}" class="h-16 px-6 flex flex justify-center items-center w-full focus:text-orange-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
                             <path
                                 d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0
-                                2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0
-                                0-1.79 1.11z"
+                                2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
                             ></path>
                         </svg>
+            
+                        <span class="hidden text-sm capitalize">Orders</span>
+                    </a>
+                </li>
+
+                <li class="hover:bg-gray-100">
+                    <a href="{% url 'weblink_channel:customer_product_list' %}" class="h-16 px-6 flex flex justify-center items-center w-full focus:text-orange-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                            <path
+                                d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0
+                                2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+                            ></path>
+                        </svg>
+            
+                        <span class="hidden text-sm capitalize">Products</span>
                     </a>
                 </li>
     
@@ -127,7 +142,7 @@
         <nav class="fixed bottom-0 w-full border bg-white lg:hidden flex overflow-x-auto">
             <!-- Bottom Icon Navigation Menu -->
     
-            <a href="." class="flex flex-col flex-grow items-center justify-center overflow-hidden whitespace-no-wrap text-sm transition-colors duration-100 ease-in-out hover:bg-gray-200 focus:text-orange-500">
+            <a href="{% url 'weblink_channel:customer_order_list' %}" class="flex flex-col flex-grow items-center justify-center overflow-hidden whitespace-no-wrap text-sm transition-colors duration-100 ease-in-out hover:bg-gray-200 focus:text-orange-500">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
                     <path
@@ -136,9 +151,21 @@
                     ></path>
                 </svg>
     
-                <span class="hidden text-sm capitalize">Inbox</span>
+                <span class="hidden text-sm capitalize">Orders</span>
             </a>
     
+            <a href="{% url 'weblink_channel:customer_product_list' %}" class="flex flex-col flex-grow items-center justify-center overflow-hidden whitespace-no-wrap text-sm transition-colors duration-100 ease-in-out hover:bg-gray-200 focus:text-orange-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                    <path
+                        d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0
+                        2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+                    ></path>
+                </svg>
+    
+                <span class="hidden text-sm capitalize">Products</span>
+            </a>
+
             <a href="." class="flex flex-col flex-grow items-center justify-center overflow-hidden whitespace-no-wrap text-sm transition-colors duration-100 ease-in-out hover:bg-gray-200 text-orange-500">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github">
                     <path

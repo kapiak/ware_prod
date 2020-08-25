@@ -16,7 +16,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from assistant.orders.models import Order
+from assistant.orders.models import Order, LineItem
 from assistant.orders.services import process_order, process_order_for_user
 from assistant.utils.forms import VueBaseFormSet
 from assistant.weblink_channel.forms import (
@@ -24,6 +24,7 @@ from assistant.weblink_channel.forms import (
     ProductAddForm,
     ShippingInformationForm,
 )
+from assistant.products.models import ProductVariant
 
 from .serializers import CartSerializer, ProductURLSerializer, UserCartSerializer
 
@@ -74,6 +75,33 @@ def get_product_by_link_sync(request: HttpRequest) -> JsonResponse:
         {"message": _("This endpoint accepts POST requests only.")},
         status=status.HTTP_405_METHOD_NOT_ALLOWED,
     )
+
+
+class CustomerProductVariantListView(ListView):
+    queryset = ProductVariant.objects.all()
+    template_name = "weblink_channel/products/list.html"
+    context_object_name = "variants"
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        order_lines = LineItem.objects.filter(order__user=self.request.user)
+        qs = qs.filter(order_lines__in=order_lines)
+        return qs.order_by("-created_at")
+
+
+class CustomerProductVariantDetailView(DetailView):
+    queryset = ProductVariant.objects.all()
+    template_name = "weblink_channel/products/detail.html"
+    context_object_name = "variant"
+    slug_field = "guid"
+    slug_url_kwarg = "guid"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        order_lines = LineItem.objects.filter(order__user=self.request.user)
+        qs = qs.filter(order_lines__in=order_lines)
+        return qs.order_by("-created_at")
 
 
 class CustomerOrderList(LoginRequiredMixin, ListView):
