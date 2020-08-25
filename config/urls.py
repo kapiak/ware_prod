@@ -22,6 +22,7 @@ urlpatterns = [
     path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     # Your stuff: custom urls includes go here
+    path("pages/", include("assistant.pages.urls", namespace="pages")),
     path("products/", include("assistant.products.urls", namespace="products")),
     path("warehouse/", include("assistant.warehouse.urls", namespace="warehouse"),),
     path(

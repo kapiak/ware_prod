@@ -21,12 +21,13 @@ class CustomerInformationForm(forms.Form):
         )
     )
     country = CountryField().formfield(
+        initial="MY",
         widget=forms.Select(
             attrs={
-                "class": "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
+                "class": "block appearance-none w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
                 "v-model": "form.customer_form.country",
             }
-        )
+        ),
     )
     state = forms.CharField(
         widget=forms.TextInput(
@@ -56,10 +57,11 @@ class CustomerInformationForm(forms.Form):
 
 class ShippingInformationForm(forms.Form):
     method = forms.ChoiceField(
-        choices=[("DHL", _("DHL")), ("FEDEX", _("FedEx")), ("USPS", _("USPS"))],
+        initial="skynet",
+        choices=[("skynet", _("Skeynet")), ("ems", _("EMS"))],
         widget=forms.Select(
             attrs={
-                "class": "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
+                "class": "block appearance-none w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",
                 "v-model": "form.shipping_form.method",
             }
         ),

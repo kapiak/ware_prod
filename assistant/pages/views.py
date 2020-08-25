@@ -1,3 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def test(request):
+    return render(request, "weblink_channel_checkout.html", {})
+

@@ -213,6 +213,7 @@ class LineItem(index.Indexed, Orderable, BaseModel):
         on_delete=models.SET_NULL,
         null=True,
     )
+    metadata = models.JSONField(default=dict, blank=True)
 
     @property
     def quantity_unfulfilled(self):

@@ -115,6 +115,7 @@ def process_order_for_user(user, **data) -> Order:
         shipping_address=address,
     )
     for item in items:
+        print(item)
         product_type = ProductType.objects.filter(slug="manual")
         if not product_type.exists():
             product_type = ProductType.objects.create(name="Manual", slug="manual")
@@ -133,11 +134,13 @@ def process_order_for_user(user, **data) -> Order:
             name=item["name"],
             price=item["price"],
             weight=Weight(kg=shipping["weight"]),
+            metadata={"url": item["url"]},
         )
         LineItem.objects.create(
             order=order,
             variant=variant,
             is_shipping_required=True,
             quantity=item["quantity"],
+            metadata={"url": item["url"]},
         )
     return order

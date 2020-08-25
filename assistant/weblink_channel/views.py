@@ -1,20 +1,13 @@
-import io
-import json
 import logging
-import uuid
 
 import aiohttp
 import requests
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.forms import formset_factory
 from django.http import HttpRequest, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.functional import cached_property
-from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView
 from rest_framework import status
@@ -22,9 +15,6 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from wagtail.admin import messages
-from wagtail.admin.modal_workflow import render_modal_workflow
 
 from assistant.orders.models import Order
 from assistant.orders.services import process_order, process_order_for_user
@@ -118,8 +108,8 @@ class CustomerOrderCreate(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                "customer_form": CustomerInformationForm(),
-                "shipping_form": ShippingInformationForm(),
+                "customer_form": CustomerInformationForm(initial={"country": "MY"}),
+                "shipping_form": ShippingInformationForm(initial={"method": "skynet"}),
                 "product_add_formset": formset_factory(
                     ProductAddForm, formset=VueBaseFormSet
                 ),
@@ -161,7 +151,7 @@ def checkout(request: HttpRequest) -> JsonResponse:
 
 
 @api_view(["POST"])
-def checkout_api_view(request: HttpRequest) -> Response:
+def checkout_api_view(request: Request) -> Response:
     data = request.data.copy()
     serializer_class = CartSerializer()
     if request.user.is_authenticated:

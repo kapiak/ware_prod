@@ -185,6 +185,7 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
     weight = MeasurementField(
         measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )
+    metadata = models.JSONField(default=dict, blank=True)
 
     images = models.ManyToManyField("ProductImage", through="VariantImage")
 

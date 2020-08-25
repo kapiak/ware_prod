@@ -15,11 +15,11 @@ const app = new Vue({
         email: "",
         city: "",
         state: "",
-        country: "",
+        country: "MY",
         code: "",
       },
       shipping_form: {
-        method: "DHL",
+        method: "skynet",
         weight: 0,
       },
       product_add_formset: [

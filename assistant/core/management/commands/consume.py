@@ -7,23 +7,20 @@ from assistant.core.pub_sub import Consumer
 class Command(BaseCommand):
     """A management command to run a worker to consume events from rabbitmq."""
 
-    help = _("Consumes messages from RabbitMQ")
+    help = _("Consumer Worker from RabbitMQ")
 
-    callback_functions = {'update_user': 'update_user'}
+    callback_functions = {"update_user": "update_user"}
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'exchange',
-            nargs='+',
-            type=str,
-            help=_("The exchange to consume from."),
+            "exchange", nargs="+", type=str, help=_("The exchange to consume from."),
         )
         parser.add_argument(
-            'queue', nargs='+', type=str, help=_("The queue to consume from.")
+            "queue", nargs="+", type=str, help=_("The queue to consume from.")
         )
         parser.add_argument(
-            'routing_key',
-            nargs='+',
+            "routing_key",
+            nargs="+",
             type=str,
             help=_("The routing key to consume from."),
         )
@@ -42,9 +39,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"{options['queue'][0]}"))
         self.stdout.write(self.style.SUCCESS(f"{options['routing_key'][0]}"))
         consumer = Consumer(
-            exchange_name=options['exchange'],
-            queue_name=options['queue'],
-            routing_key=options['routing_key'],
+            exchange_name=options["exchange"],
+            queue_name=options["queue"],
+            routing_key=options["routing_key"],
             callback=self._callback,
             error_callback=self._onerror_callback,
         )
