@@ -52,6 +52,21 @@
     const successURL = "{% url 'weblink_channel:customer_order_list' %}"
     const checkout = "{% url 'weblink_channel:checkout' %}"
     const checkoutAPI = "{% url 'weblink_channel:checkout-api-view' %}"
+    {% if request.user.is_authenticated %}
+        const customer = {
+            name: "{{ request.user.shipping_address.name|safe }}",
+            email: "{{ request.user.shipping_address.email|safe }}",
+            city: "{{ request.user.shipping_address.city|safe }}",
+            state: "{{ request.user.shipping_address.state|safe }}"
+        };
+        {% else %}
+        const customer = {
+            name: "",
+            email: "",
+            city: "",
+            state: ""
+        }
+    {% endif %}
   </script>
   <script src="{% static 'js/checkout.js' %}"></script>
 {% endblock vue_app %}

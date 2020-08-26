@@ -116,7 +116,6 @@ def process_order_for_user(user, **data) -> Order:
         shipping_address=address,
     )
     for item in items:
-        print(item)
         product_type = ProductType.objects.filter(slug="manual")
         if not product_type.exists():
             product_type = ProductType.objects.create(name="Manual", slug="manual")

@@ -11,8 +11,8 @@ const app = new Vue({
     csrfmiddlewaretoken: csrfToken,
     form: {
       customer_form: {
-        name: "",
-        email: "",
+        name: customer.name,
+        email: customer.email,
         city: "",
         state: "",
         country: "MY",
