@@ -13,10 +13,10 @@ const app = new Vue({
       customer_form: {
         name: customer.name,
         email: customer.email,
-        city: "",
-        state: "",
+        city: customer.city,
+        state: customer.city_area,
         country: "MY",
-        code: "",
+        code: customer.postal_code,
       },
       shipping_form: {
         method: "skynet",

@@ -11,7 +11,7 @@
 {% include_block page.content %}
 
 {% include "pages/checkout/index.html" %}
-
+{{ request.user }}
 {% endblock body %}
 
 {% block vue_app %}
@@ -25,19 +25,21 @@
     const successURL = "{% url 'weblink_channel:customer_order_list' %}"
     const checkout = "{% url 'weblink_channel:checkout' %}"
     const checkoutAPI = "{% url 'weblink_channel:checkout-api-view' %}"
-    {% if request.user.is_authenticated %}
+    {% if user.is_authenticated %}
         const customer = {
-            name: "{{ request.user.shipping_address.name|safe }}",
-            email: "{{ request.user.shipping_address.email|safe }}",
-            city: "{{ request.user.shipping_address.city|safe }}",
-            state: "{{ request.user.shipping_address.state|safe }}"
+            name: "{{ user.shipping_address.full_name|safe }}",
+            email: "{{ user.email|safe }}",
+            city: "{{ user.shipping_address.city|safe }}",
+            city_area: "{{ user.shipping_address.city_area|safe }}",
+            postal_code: "{{ user.shipping_address.postal_code|safe }}"
         };
         {% else %}
         const customer = {
             name: "",
             email: "",
             city: "",
-            state: ""
+            state: "",
+            postal_code: ""
         }
     {% endif %}
   </script>
