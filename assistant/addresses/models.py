@@ -1,12 +1,13 @@
 from django.db import models
+from django.forms import ValidationError
+from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
-
-from wagtail.search import index
-from wagtail.snippets.models import register_snippet
+from django_countries.fields import Country, CountryField
 from phonenumber_field.modelfields import PhoneNumber, PhoneNumberField
 from phonenumber_field.phonenumber import to_python
 from phonenumbers.phonenumberutil import is_possible_number
-from django_countries.fields import Country, CountryField
+from wagtail.search import index
+from wagtail.snippets.models import register_snippet
 
 from assistant.core.models import BaseModel
 

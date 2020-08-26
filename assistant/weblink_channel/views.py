@@ -191,7 +191,7 @@ def checkout_api_view(request: Request) -> Response:
     if request.user.is_authenticated:
         serializer_class = UserCartSerializer
         data["customer_form"].update(
-            {"name": request.user.fullname, "email": request.user.email}
+            {"name": request.user.full_name, "email": request.user.email}
         )
         serializer = serializer_class(data=data)
         if serializer.is_valid():
