@@ -19,6 +19,7 @@ urlpatterns = [
     path("sync-scrape/", get_product_by_link_sync, name="get_product_by_link_sync",),
     path("checkout/", checkout, name="checkout"),
     path("checkout-api/", checkout_api_view, name="checkout-api-view"),
+    path("guest-checkout-api/", checkout_api_view, name="guest-checkout-api-view"),
     path("customer-orders/", CustomerOrderList.as_view(), name="customer_order_list"),
     path(
         "customer-orders/<uuid:guid>/",

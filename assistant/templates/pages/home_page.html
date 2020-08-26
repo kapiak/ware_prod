@@ -24,7 +24,7 @@
     const checkoutURL = "{% url 'weblink_channel:checkout' %}"
     const successURL = "{% url 'weblink_channel:customer_order_list' %}"
     const checkout = "{% url 'weblink_channel:checkout' %}"
-    const checkoutAPI = "{% url 'weblink_channel:checkout-api-view' %}"
+    const checkoutAPI = "{% url 'weblink_channel:guest-checkout-api-view' %}"
     {% if user.is_authenticated %}
         const customer = {
             name: "{{ user.shipping_address.full_name|safe }}",

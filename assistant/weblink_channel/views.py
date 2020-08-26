@@ -11,12 +11,14 @@ from django.http import HttpRequest, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
     permission_classes,
 )
 from rest_framework.parsers import JSONParser
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -183,15 +185,44 @@ def checkout(request: HttpRequest) -> JsonResponse:
 
 
 @api_view(["POST"])
-@authentication_classes([])
-@permission_classes([])
+@authentication_classes([SessionAuthentication])
+@permission_classes([AllowAny])
 def checkout_api_view(request: Request) -> Response:
     data = request.data.copy()
     serializer_class = CartSerializer
     if request.user.is_authenticated:
         serializer_class = UserCartSerializer
         data["customer_form"].update(
-            {"name": request.user.full_name, "email": request.user.email}
+            {"name": request.user.fullname, "email": request.user.email}
+        )
+        serializer = serializer_class(data=data)
+        if serializer.is_valid():
+            process_order_for_user(user=request.user, **serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    serializer = serializer_class(data=data)
+    if serializer.is_valid():
+        try:
+            process_order(**serializer.data)
+        except ValidationError as eae:
+            return Response(
+                {"message": eae.message, "code": eae.code},
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
+def guest_checkout_api_view(request: Request) -> Response:
+    data = request.data.copy()
+    serializer_class = CartSerializer
+    if request.user.is_authenticated:
+        serializer_class = UserCartSerializer
+        data["customer_form"].update(
+            {"name": request.user.fullname, "email": request.user.email}
         )
         serializer = serializer_class(data=data)
         if serializer.is_valid():
