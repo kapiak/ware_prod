@@ -28,7 +28,7 @@ const app = new Vue({
           name: "",
           quantity: 0,
           price: 0,
-          comments: "",
+          comments: null,
         },
       ],
     },

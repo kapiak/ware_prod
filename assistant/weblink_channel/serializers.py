@@ -39,7 +39,7 @@ class ProductCartSerializer(serializers.Serializer):
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
     )
-    comments = serializers.CharField()
+    comments = serializers.CharField(required=False, allow_null=True)
 
 
 class CartSerializer(serializers.Serializer):
