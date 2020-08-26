@@ -11,20 +11,24 @@ from django.http import HttpRequest, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from assistant.orders.models import Order, LineItem
+from assistant.orders.models import LineItem, Order
 from assistant.orders.services import process_order, process_order_for_user
+from assistant.products.models import ProductVariant
 from assistant.utils.forms import VueBaseFormSet
 from assistant.weblink_channel.forms import (
     CustomerInformationForm,
     ProductAddForm,
     ShippingInformationForm,
 )
-from assistant.products.models import ProductVariant
 
 from .serializers import CartSerializer, ProductURLSerializer, UserCartSerializer
 
@@ -179,9 +183,11 @@ def checkout(request: HttpRequest) -> JsonResponse:
 
 
 @api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def checkout_api_view(request: Request) -> Response:
     data = request.data.copy()
-    serializer_class = CartSerializer()
+    serializer_class = CartSerializer
     if request.user.is_authenticated:
         serializer_class = UserCartSerializer
         data["customer_form"].update(

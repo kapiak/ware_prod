@@ -58,7 +58,7 @@ class CustomerInformationForm(forms.Form):
 class ShippingInformationForm(forms.Form):
     method = forms.ChoiceField(
         initial="skynet",
-        choices=[("skynet", _("Skeynet")), ("ems", _("EMS"))],
+        choices=[("skynet", _("Skynet")), ("ems", _("EMS"))],
         widget=forms.Select(
             attrs={
                 "class": "block appearance-none w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500",

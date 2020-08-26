@@ -22,9 +22,9 @@ User = get_user_model()
 
 @transaction.atomic
 def process_order(**data) -> Order:
-    customer = data.pop("customer")
-    shipping = data.pop("shipping")
-    items = data.pop("items")
+    customer = data.pop("customer_form")
+    shipping = data.pop("shipping_form")
+    items = data.pop("product_add_formset")
 
     address = Address.objects.create(
         first_name=customer["name"],
@@ -39,7 +39,6 @@ def process_order(**data) -> Order:
             name=customer["name"],
             username=customer["email"],
             email=customer["email"],
-            password=customer["password"],
             shipping_address=address,
         )
 
@@ -79,12 +78,14 @@ def process_order(**data) -> Order:
             name=item["name"],
             price=item["price"],
             weight=Weight(kg=shipping["weight"]),
+            metadata={"url": item["url"]},
         )
         LineItem.objects.create(
             order=order,
             variant=variant,
             is_shipping_required=True,
             quantity=item["quantity"],
+            metadata={"url": item["url"]},
         )
     return order
 
