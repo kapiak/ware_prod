@@ -14,8 +14,12 @@ from django.utils.translation import gettext_lazy as _
 class TimestampMixin(models.Model):
     """Abstract model which provides a timestamp for the creation, and the updates on an Object."""
 
-    created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
-    updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
+    created_at = models.DateTimeField(
+        verbose_name=_("Created at"), auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=_("Updated at"), auto_now=True
+    )
 
     class Meta:
         abstract = True
@@ -58,9 +62,11 @@ class BaseModel(GUIDMixin, AuditMixin, TimestampMixin):
 
 
 class RemoteModel:
-    service_base_url: str = 'localhost:8000'
+    service_base_url: str = 'test:8000'
 
-    def __init__(self, request: HttpRequest, entity: str, version: str) -> None:
+    def __init__(
+        self, request: HttpRequest, entity: str, version: str
+    ) -> None:
         self.request = request
         self.entity = entity
         self.version = version
@@ -84,9 +90,9 @@ class RemoteModel:
 
     def get(self, entity_id: Union[int, uuid.UUID]):
         response = requests.get(
-            f'{self.url}/{entity_id}', 
-            headers=self._headers(), 
-            cookies=self._cookies()
+            f'{self.url}/{entity_id}',
+            headers=self._headers(),
+            cookies=self._cookies(),
         )
         return response
 
@@ -95,7 +101,7 @@ class RemoteModel:
         response = requests.get(
             f'{self.url}/{params}',
             headers=self._headers(),
-            cookies=self._cookies()
+            cookies=self._cookies(),
         )
         return response
 
@@ -103,7 +109,7 @@ class RemoteModel:
         response = requests.delete(
             f'{self.url}/{entity_id}',
             headers=self._headers(),
-            cookies=self._cookies()
+            cookies=self._cookies(),
         )
         return response
 
@@ -112,7 +118,7 @@ class RemoteModel:
             f'{self.url}/',
             data=json.dumps(entity_data),
             headers=self._headers(),
-            cookies=self._cookies()
+            cookies=self._cookies(),
         )
         return response
 
@@ -122,6 +128,6 @@ class RemoteModel:
             f'{self.url}/{entity_id}',
             data=data,
             headers=self._headers(),
-            cookies=self._cookies()
+            cookies=self._cookies(),
         )
         return response
