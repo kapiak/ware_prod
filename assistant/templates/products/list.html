@@ -1,0 +1,91 @@
+{% extends 'layout.html' %} 
+{% load i18n humanize %}
+{% block page_title %} {% trans 'Products' %} {% endblock %}
+{% block extra_header_css %}
+<style>
+.inner-table {
+    margin-top: 8px;
+}
+</style>
+{% endblock extra_header_css%}
+{% block header_title %} {% trans 'Products' %} {% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{% trans 'Products' %}</h3>
+
+        <div class="card-tools">
+          <div class="input-group input-group-sm" style="width: 150px">
+            <input
+              type="text"
+              name="table_search"
+              class="form-control float-right"
+              placeholder="Search"
+            />
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive p-0">
+        <table class="table table-hover text-nowrap">
+          <thead>
+            <tr>
+              <th class="m-w-50">{% trans 'Title' %}</th>
+              <th>{% trans 'Vendor' %}</th>
+              <th>{% trans 'Type' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+            <tr class="nested-table">
+              <td>
+                <h3 class="bold">{{ product.title }}</h3>
+                <br>
+                <small>{% trans 'created on' %} {{ product.created_at|naturalday }}</small>  
+              </td>
+              <td>{{ product.vendor }}</td>
+              <td>{{ product.product_type }}</td>
+            </tr>
+            {% for item in product.variants.all %}
+              <tr>
+                  <td colspan="1">{{ item.sku|truncatechars_html:50 }}</td>
+                  <td>
+                    <dl class="row">
+                      <dt class="col-sm-4">{% trans 'Needed Stock:' %}</dt>
+                      <dd class="col-sm-8">{{ item.needed_stock }}</dd>
+
+                      <dt class="col-sm-4">{% trans 'In Purchase:' %}</dt>
+                      <dd class="col-sm-8">{{ item.in_purchase }}</dd>
+
+                      <dt class="col-sm-4">{% trans 'Available Quantity:' %}</dt>
+                      <dd class="col-sm-8">{{ item.available_stock }}</dd>
+                    </dl>
+                  </td>
+                  <td>
+                    <div class="input-group mb-3">
+                        <div class="btn-group">
+                          <button href="#" type="button" class="btn btn-info receive-button">{% trans 'Receive' %}</button>
+                          <button type="button" class="btn btn-success">{% trans 'Add to Purchase' %}</button>
+                        </div>
+                    </div>
+                  </td>
+              <tr>
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+</div>
+{% endblock content %}

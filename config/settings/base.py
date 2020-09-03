@@ -62,7 +62,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "django.contrib.humanize", # Handy template tags
+    "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
 ]
@@ -119,6 +119,7 @@ LOCAL_APPS = [
     "assistant.orders.apps.OrdersConfig",
     "assistant.warehouse.apps.WarehouseConfig",
     "assistant.purchases.apps.PurchasesConfig",
+    "assistant.shipping.apps.ShippingConfig",
     "assistant.weblink_channel.apps.WeblinkChannelConfig",
     # Your stuff: custom apps go here
     "assistant.shopify_sync.apps.ShopifySyncConfig",

@@ -11,3 +11,14 @@
   background-color: #f2dede;
   border-color: #eed3d7;
 }
+
+.nested-table {
+  padding: 5px; 
+  border-style: solid; 
+  border-width: 2px 0px 0px 0px; 
+  border-color: #858796
+}
+
+.light-text {
+  color: #b3b3b3;
+}

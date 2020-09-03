@@ -1,0 +1,107 @@
+{% load static i18n %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="index3.html" class="brand-link">
+    <img
+      src="{% static 'images/AdminLTELogo.png' %}"
+      alt="{% trans 'Application Logo' %}"
+      class="brand-image img-circle elevation-3"
+      style="opacity: 0.8"
+    />
+    <span class="brand-text font-weight-light">Harumio</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+        <img
+          src="{% static 'images/avatar.jpg' %}"
+          class="img-circle elevation-2"
+          alt="{% trans 'User Image' %}"
+        />
+      </div>
+      <div class="info">
+        <a href="#" class="d-block">{{ request.user }}</a>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul
+        class="nav nav-pills nav-sidebar flex-column"
+        data-widget="treeview"
+        role="menu"
+        data-accordion="false"
+      >
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fa fa-tachometer-alt"></i>
+            <p>{% trans 'Dashboard' %}</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'orders:order-list' %}" class="nav-link">
+            <i class="nav-icon fa fa-cash-register"></i>
+            <p>{% trans 'Sales Orders' %}</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'shipping:shipment_list' %}" class="nav-link">
+            <i class="nav-icon fa fa-plane-departure"></i>
+            <p>{% trans 'Shipping' %}</p>
+          </a>
+        </li>
+        <li class="nav-item has-treeview">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fa fa-money-bill-alt"></i>
+            <p>
+              {% trans 'Purchase' %}
+              <i class="fas fa-angle-left right"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'purchases:purchase-order-list' %}" class="nav-link">
+                <i class="nav-icon fa fa-copy nav-icon"></i>
+                <p>{% trans 'Orders' %}</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa fa-box-open nav-icon"></i>
+                <p>{% trans 'Receive' %}</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-treeview">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fa fa-boxes"></i>
+            <p>
+              {% trans 'Inventory' %}
+              <i class="fas fa-angle-left right"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'products:product-list' %}" class="nav-link">
+                <i class="nav-icon fa fa-tshirt"></i>
+                <p>{% trans 'Products' %}</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-barcode"></i>
+                <p>{% trans 'SKUs' %}</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>

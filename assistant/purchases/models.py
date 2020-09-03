@@ -59,6 +59,12 @@ class PurchaseOrderItem(index.Indexed, Orderable, BaseModel):
     purchase_order = ParentalKey(
         PurchaseOrder, related_name="items", on_delete=models.CASCADE
     )
+    variant = models.ForeignKey(
+        "products.ProductVariant",
+        related_name="purchase_orders",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
     quantity = models.PositiveIntegerField()
     status = models.CharField(
         verbose_name=_("Status"),

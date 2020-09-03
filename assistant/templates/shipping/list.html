@@ -1,0 +1,92 @@
+{% extends 'layout.html' %} 
+{% load i18n humanize %}
+{% block page_title %} {% trans 'Shippment' %} {% endblock %}
+{% block extra_header_css %}
+<style>
+.inner-table {
+    margin-top: 8px;
+}
+</style>
+{% endblock extra_header_css%}
+{% block header_title %} {% trans 'Shipment' %} {% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{% trans 'Shipment' %}</h3>
+
+        <div class="card-tools">
+          <div class="input-group input-group-sm" style="width: 150px">
+            <input
+              type="text"
+              name="table_search"
+              class="form-control float-right"
+              placeholder="Search"
+            />
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive p-0">
+        <table class="table table-hover text-nowrap">
+          <thead>
+            <tr>
+              <th class="m-w-50">{% trans 'Number' %}</th>
+              <th>{% trans 'Order' %}</th>
+              <th>{% trans 'Actions' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for shipment in shipments %}
+                <tr class="nested-table">
+                    <td>
+                        <h3 class="bold">{{ shipment.number }}</h3>
+                        <br>
+                        <small>{% trans 'created on' %} {{ shipment.created_at|naturalday }}</small>
+                    </td>
+                    <td>{{ shipment.order.number }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'shipping:shipment_detail' shipment.guid %}" class="btn btn-outline-primary btn-sm">{% trans 'Edit Shipment' %}</a>
+                            <a href="#" class="btn btn-primary btn-sm">{% trans 'Print Label' %}</a>
+                        </div>
+                    </td>
+                </tr>
+                {% for line in shipment.lines.all %}
+                    <tr>
+                        <td>
+                            <dl>
+                                <dt class="col-sm-4 light-text">{% trans 'SKU' %}</dt>
+                                <dd class="col-sm-8">{{ line.order_line.variant.sku }}</dd>
+                                <dt class="col-sm-4 light-text">{% trans 'Weight' %}</dt>
+                                <dd class="col-sm-8">{{ line.order_line.variant.weight }}</dd>
+                                <dt class="col-sm-4 light-text">{% trans 'Unit Price' %}</dt>
+                                <dd class="col-sm-8">{{ line.order_line.variant.price }}</dd>
+                                <dt class="col-sm-4 light-text">{% trans 'Cost Price' %}</dt>
+                                <dd class="col-sm-8">{{ line.order_line.variant.cost_price|default:"-" }}</dd>
+                            </dl>
+                        <td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+       {% if is_paginated %}
+        <div class="card-footer clearfix">
+            {% include 'core/includes/paginator.html' with page_obj=page_obj %}
+        </div>  
+        {% endif %}  
+    </div>
+    <!-- /.card -->
+  </div>
+</div>
+{% endblock content %}

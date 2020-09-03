@@ -4,7 +4,7 @@ from assistant.products.models import Supplier, ProductVariant
 from .models import PurchaseOrder, PurchaseOrderItem
 
 
-def process_purchase_order(**data) -> PurchaseOrder:
+def process_purchase_order(variant, **data) -> PurchaseOrder:
     system_supplier = data.get("system_supplier", None)
     if system_supplier:
         supplier = data["system_supplier"]
@@ -17,6 +17,7 @@ def process_purchase_order(**data) -> PurchaseOrder:
     )
     purchase_order_item = PurchaseOrderItem.objects.create(
         purchase_order=obj,
+        variant=variant,
         quantity=data.get("quantity"),
         status=PurchaseOrder.StatusChoices.DRAFT,
     )

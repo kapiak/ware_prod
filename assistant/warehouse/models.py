@@ -12,6 +12,8 @@ from assistant.core.models import BaseModel
 from assistant.orders.models import Order, LineItem
 from .exceptions import InsufficientStock
 
+from .signals import stock_increased, allocated_stock
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,49 +80,53 @@ class Stock(BaseModel):
     objects = StockQuerySet.as_manager()
 
     def __str__(self):
-        return f"{self.warehouse} - {self.product_variant.sku} -> {self.quantity}"
+        return f"{self.warehouse} - {self.product_variant.name} -> {self.quantity}"
 
     def increase_stock(self, quantity: int, commit: bool = True):
         """Incase given quantity of product variant to a stock in a warehouse."""
         self.quantity = F("quantity") + quantity
         if commit:
             self.save(update_fields=["quantity"])
-            logger.info(f"Increasing stock by {quantity} committed")
+            stock_increased.send(sender=self.__class__, instance=self, quantity=self.quantity, variant=self.product_variant)
+            logger.info(f"Increasing stock by %s committed", quantity)
 
     def decrease_stock(self, quantity: int, commit: bool = True):
         """Incase given quantity of product variant to a stock in a warehouse."""
         self.quantity = F("quantity") - quantity
         if commit:
             self.save(update_fields=["quantity"])
-            logger.info(f"Decreasing stock by {quantity} committed")
+            logger.info(f"Decreasing stock by %s committed", quantity)
 
-    def allocate_to_order_line_item(self, line_item: uuid.UUID, quantity: int):
+    def allocate_to_order_line_item(self, line_item: uuid.UUID):
         """Allocate stock to an line item in and order if the stock is available
         in a specific warehouse.
         If there is not enough stock to allocate raise InsufficientStock
         """
         with transaction.atomic():
-            if self.quantity >= quantity:
-                logger.info("We are allocating stock")
+            if self.quantity >= line_item.unallocated_quantity:
+                quantity = line_item.unallocated_quantity
+                logger.info("Enough Stock to fully allocate to the line item.")
+                Allocation.objects.create(
+                    order_line=line_item,
+                    stock=self,
+                    quantity_allocated=quantity,
+                )
+                logger.info("Unallocated quantity is %s Current Quantity %s", quantity, self.quantity)
+                self.decrease_stock(quantity, commit=True)
+                allocated_stock.send(sender=self.__class__, instance=self, line_item=line_item)
+                return True
+            elif self.quantity < line_item.unallocated_quantity and self.quantity > 0:
+                quantity = self.quantity
+                logger.info("Not enough stock to fully allocate the line item. allocating what we can.")
                 Allocation.objects.create(
                     order_line=line_item, stock=self, quantity_allocated=quantity,
                 )
-                self.stock = F("quantity") - quantity
-                self.save()
-                logger.info(f"Allocated stock to order.")
-                return True
-            elif self.quantity > 0:
-                logger.info("Not enough stock is available.")
-                logger.info("We are allocating currently available stock")
-                Allocation.objects.create(
-                    order_line=line_item, stock=self, quantity_allocated=self.quantity,
-                )
-                self.stock = F("quantity") - self.quantity
-                self.save()
-                logger.info(f"Allocated stock to order.")
+                logger.info("Unallocated quantity is %s Current Quantity %s", quantity, self.quantity)
+                self.decrease_stock(quantity, commit=True)
+                allocated_stock.send(sender=self.__class__, instance=self, line_item=line_item)
                 return True
             else:
-                raise InsufficientStock(_("Not enough Stock"), code="no_stock")
+                raise InsufficientStock()
 
     class Meta:
         verbose_name = _("Stock")
@@ -149,4 +155,4 @@ class Allocation(models.Model):
         verbose_name_plural = _("Allocations")
 
     def __str__(self):
-        return f"{self.order_lines} allocated {self.quantity_allocated}"
+        return f"{self.stock} allocated {self.quantity_allocated}"

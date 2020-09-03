@@ -1,0 +1,9 @@
+{% extends 'layout.html' %} 
+{% load i18n humanize %}
+{% block page_title %} {% trans 'Shipment' %} {% endblock %}
+
+{% block content %}
+{{ shipment_form.as_p }}
+{{ shipment_line_formset.as_p }}
+{{ shipment_piece_formset.as_p }}
+{% endblock content %}

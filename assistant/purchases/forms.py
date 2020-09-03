@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 class PurchaseOrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
         variant = kwargs.pop("variant")
+        self.variant = variant
         super().__init__(**kwargs)
         self.fields["sales_orders"].queryset = LineItem.objects.filter(variant=variant)
 
@@ -33,7 +34,7 @@ class PurchaseOrderForm(forms.Form):
     )
 
     def save(self):
-        obj = process_purchase_order(**self.cleaned_data)
+        obj = process_purchase_order(variant=self.variant, **self.cleaned_data)
         return obj
 
     def clean(self):

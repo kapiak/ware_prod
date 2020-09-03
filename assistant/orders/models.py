@@ -190,6 +190,11 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
 
+    @property
+    def fully_allocated(self):
+        fully_allocated = [True if item.fully_allocated else False for item in self.lines.all()]
+        return all(fully_allocated)
+
 
 class LineItem(index.Indexed, Orderable, BaseModel):
     """ """
@@ -220,8 +225,16 @@ class LineItem(index.Indexed, Orderable, BaseModel):
         return self.quantity - self.quantity_fulfilled
 
     @property
+    def unallocated_quantity(self):
+        return self.quantity - self.allocated
+
+    @property
     def allocated(self):
-        return self.allocations.aggregate(allocated=Sum("quantity_allocated"))
+        return self.allocations.aggregate(allocated=Sum("quantity_allocated"))["allocated"] or 0
+
+    @property
+    def fully_allocated(self):
+        return self.allocated == self.quantity
 
     @property
     def requires(self):

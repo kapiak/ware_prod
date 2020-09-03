@@ -147,15 +147,15 @@ class ProductVariantWagtailAdmin(ThumbnailMixin, ModelAdmin):
         return qs
 
     def available_stock(self, obj):
-        val = obj.available_stock["quantity"] or 0
+        val = obj.available_stock or 0
         return val
 
     def needed_stock(self, obj):
-        val = obj.needed_stock["quantity"] or 0
+        val = obj.needed_stock or 0
         return val
 
     def quantity_in_purchase(self, obj):
-        val = obj.in_purchase["quantity"] or 0
+        val = obj.in_purchase or 0
         return val
 
     def to_purchase(self, obj):

@@ -1,16 +1,16 @@
 import uuid
 
 from django.core.paginator import Paginator
-from django.http import JsonResponse, HttpRequest
-from django.db.models import F, Sum, Q
-from django.shortcuts import render, get_object_or_404
-
+from django.db.models import F, Q, Sum
+from django.http import HttpRequest, JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import ListView
 from wagtail.admin.modal_workflow import render_modal_workflow
 
-from assistant.orders.models import Order, LineItem
+from assistant.orders.models import LineItem, Order
 from assistant.products.models import Product, ProductVariant
-from assistant.purchases.models import PurchaseOrder, PurchaseOrderItem
 from assistant.purchases.forms import PurchaseOrderForm
+from assistant.purchases.models import PurchaseOrder, PurchaseOrderItem
 from assistant.warehouse.forms import SimpleAllocationForm, StockReceiveForm
 
 
@@ -114,12 +114,9 @@ def receive_product_stock(request: HttpRequest, guid: uuid.UUID) -> JsonResponse
             purchase_orders=purchase_orders,
         )
         if form.is_valid():
-            print("Yaaaay")
-            print(form)
             return render_modal_workflow(
                 request, None, None, {"obj": variant}, json_data={"step": "received"}
             )
-        print(form.errors)
         return render_modal_workflow(
             request,
             None,
@@ -139,3 +136,14 @@ def receive_product_stock(request: HttpRequest, guid: uuid.UUID) -> JsonResponse
         {"obj": variant, "form": form},
         json_data={"step": "chooser"},
     )
+
+
+class ProductListView(ListView):
+    template_name = "products/list.html"
+    queryset = Product.objects.all()
+    context_object_name = "products"
+    paginate_by = 100
+
+    def get_queryset(self):
+        qs = super().get_queryset().prefetch_related("variants")
+        return qs

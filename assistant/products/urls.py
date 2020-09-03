@@ -5,11 +5,13 @@ from .views import (
     make_product_purchase,
     allocate_product_to_order,
     receive_product_stock,
+    ProductListView
 )
 
 app_name = "products"
 
 urlpatterns = [
+    path('', ProductListView.as_view(), name="product-list"),
     path(
         "product-orders-modal/<uuid:guid>/",
         product_orders_modal,

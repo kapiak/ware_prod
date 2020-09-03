@@ -1,17 +1,17 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey
-from wagtail.core.models import Orderable
-from wagtail.search import index
-from wagtail.core.fields import RichTextField
 from django_measurement.models import MeasurementField
 from djmoney.models.fields import MoneyField
 from measurement.measures import Weight
+from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
+from wagtail.core.fields import RichTextField
+from wagtail.core.models import Orderable
+from wagtail.search import index
 
 from assistant.core.models import BaseModel
+from assistant.purchases.models import PurchaseOrderItem
 
 
 class WeightUnits:
@@ -205,7 +205,7 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
 
     @property
     def available_stock(self):
-        val = self.stocks.aggregate(quantity=models.Sum("quantity"))
+        val = self.stocks.aggregate(quantity=models.Sum("quantity"))["quantity"]
         return val or 0
 
     @property
@@ -226,21 +226,12 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
                 Order.StatusChoices.FULFILLED,
                 Order.StatusChoices.CANCELED,
             ]
-        ).aggregate(quantity=models.Sum("quantity"))
+        ).aggregate(quantity=models.Sum("quantity"))['quantity']
         return val or 0
 
     @property
     def in_purchase(self):
-        from assistant.orders.models import Order
-
-        val = self.order_lines.exclude(
-            order__status__in=[
-                Order.StatusChoices.FULFILLED,
-                Order.StatusChoices.CANCELED,
-            ]
-        ).aggregate(quantity=models.Sum("purchase_order__quantity"))
-        return val or 0
-
+        return PurchaseOrderItem.objects.filter(variant=self).aggregate(quantity=models.Sum("quantity"))["quantity"] or 0
 
 class ProductImage(Orderable, BaseModel):
     product = models.ForeignKey(
