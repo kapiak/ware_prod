@@ -32,6 +32,7 @@ urlpatterns = [
         "weblink-channel/",
         include("assistant.weblink_channel.urls", namespace="weblink_channel"),
     ),
+    path("shopify/", include("assistant.shopify_sync.urls"), name="shopify_sync"),
     path("api/", include("config.api_router")),
     path("auth-token/", obtain_auth_token),
     # Wagtail CMS
