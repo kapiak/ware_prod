@@ -55,7 +55,7 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
         # order with no items marked as fulfilled
         UNFULFILLED = "unfulfilled", _("Unfulfilled")
         # order with some items marked as fulfilled
-        PARTIALLY_FULFILLED = "partially fulfilled", _("Partially Fulfilled")
+        PARTIALLY_FULFILLED = "partially_fulfilled", _("Partially Fulfilled")
         # order with all items marked as fulfilled
         FULFILLED = "fulfilled", _("Fulfilled")
         # permanently canceled order
@@ -185,6 +185,7 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
         null=True,
         help_text=_("The date and time when the order was closed."),
     )
+    metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
         verbose_name = _("Order")

@@ -28,13 +28,18 @@
     </div>
     <!-- /.col -->
     <div class="col-sm-4 invoice-col">
-        To
+        <div class="">
+            To
+            <div class="float-right">
+                <a href="#">Edit</a>
+            </div>
+        </div>
         <address>
             {% if shipment.order.shipping_address.company_name %}
                 {{ shipment.order.shipping_address.company_name }}<br />
             {% endif %}
-            {{ shipment.order.shipping_address.first_name }}
-            {{ shipment.order.shipping_address.last_name }}<br />
+            <strong>{{ shipment.order.shipping_address.first_name }} {{ shipment.order.shipping_address.last_name }}<br /></strong>
+            
             {% if shipment.order.shipping_address.street_address_1 %}
                 {{ shipment.order.shipping_address.street_address_1 }}<br />
             {% endif %}
@@ -71,6 +76,11 @@
             <th>{% trans 'Product' %}</th>
             <th>{% trans 'SKU' %}</th>
             <th>{% trans 'Weight' %}</th>
+            <th>{% trans 'Width' %}</th>
+            <th>{% trans 'Height' %}</th>
+            <th>{% trans 'Depth' %}</th>
+            <th>{% trans 'Declared Value' %}</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -80,6 +90,15 @@
             <td>{{ item.order_line.variant.name }}</td>
             <td>{{ item.order_line.variant.sku }}</td>
             <td>{{ item.order_line.variant.weight }}</td>
+            <td>{{ item.order_line.variant.width }}</td>
+            <td>{{ item.order_line.variant.height }}</td>
+            <td>{{ item.order_line.variant.depth }}</td>
+            <td>{{ item.order_line.variant.declared_value }}</td>
+            <td>
+                <button type="button" class="btn btn-default shipping-detail-modal" data-url="{% url 'shipping:shipping_item_detail_modal' item.guid %}">
+                  Edit
+                </button>
+            </td>
         </tr>
         {% endfor %}
         </tbody>
@@ -93,7 +112,7 @@
     <!-- accepted payments column -->
     <div class="col-6">
         <p class="lead">Shipping Methods:</p>
-        <dl>
+        <dl class="row">
             <dt class="col-sm-4 light-text">DHL</dt>
             <dd class="col-sm-8">200</dd>
             <dt class="col-sm-4 light-text">FedEx</dt>
@@ -128,7 +147,7 @@
     <!-- this row will not appear when printing -->
     <div class="row no-print">
     <div class="col-12">
-        <a href="invoice-print.html" target="_blank" class="btn btn-default">
+        <a href="{% url 'shipping:get_dhl_rate' %}" class="btn btn-default">
             <i class="far fa-credit-card"></i>
             {% trans 'Refresh Shipping Rates' %}
         </a>
@@ -143,4 +162,48 @@
     </div>
     </div>
 </div>
+<div id="modal-div"></div>
 {% endblock content %}
+
+{% block extra_body_js %}
+<script>
+    const initModal = function(res) {
+        $("#modal-div").html(res)
+            $('#editShipmentLine').modal('show'); 
+            $("form").on("submit", function(e) {
+            e.preventDefault()
+            $.ajax({
+                url: this.getAttribute('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: handlePostSubmitSuccess
+            })
+        })
+    }
+
+    const handlePostSubmitSuccess = function (res) {
+        if ( res.valid === true) {
+            $(document).Toasts('create', {
+                title: "{% trans 'Success' %}",
+                body: res.title,
+                autohide: true,
+                delay: 3000,
+                class: "bg-success"
+            });
+        $('#editShipmentLine').modal('toggle');
+            } else {
+        $("#modal-div").html(res)
+        $("#editShipmentLine").modal('show');
+            initModal()
+        }
+    }
+
+    const btn = document.querySelector('.shipping-detail-modal')
+    btn.addEventListener('click', function(e) {
+        $.get({
+            url: this.getAttribute("data-url"),
+            success: initModal
+        })
+    });
+</script>
+{% endblock extra_body_js %}

@@ -65,7 +65,7 @@
                     <td>
                         <div class="btn-group">
                             {% if order.fully_allocated %}
-                              <a href="{% url 'shipping:shipping_form_view' order.guid %}" class="btn btn-block btn-outline-primary btn-lg">{% trans 'Create Shipment' %}</a>
+                              {% comment %} <a href="{% url 'shipping:shipment_detail' order.shipments.first.guid %}" class="btn btn-block btn-outline-primary btn-lg">{% trans 'View Shipment' %}</a> {% endcomment %}
                             {% endif %}
                         </div>
                     </td>

@@ -107,7 +107,7 @@ class Shipment(index.Indexed, BaseModel, ClusterableModel):
     shipping_method = models.ForeignKey(ShippingMethod, related_name="shipments", on_delete=models.SET_NULL, null=True)
     shipper = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="shipments", on_delete=models.SET_NULL, null=True)
 
-    order = models.ForeignKey("orders.Order", related_name="Order", on_delete=models.PROTECT)
+    order = models.ForeignKey("orders.Order", related_name="shipments", on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = _("Shipment")

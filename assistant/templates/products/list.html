@@ -59,7 +59,7 @@
                   <td colspan="1">{{ item.sku|truncatechars_html:50 }}</td>
                   <td>
                     <dl class="row">
-                      <dt class="col-sm-4">{% trans 'Needed Stock:' %}</dt>
+                      <dt class="col-sm-4">{% trans 'To Purchase:' %}</dt>
                       <dd class="col-sm-8">{{ item.needed_stock }}</dd>
 
                       <dt class="col-sm-4">{% trans 'In Purchase:' %}</dt>
@@ -82,6 +82,11 @@
             {% endfor %}
           </tbody>
         </table>
+        {% if is_paginated %}
+        <div class="card-footer clearfix">
+            {% include 'core/includes/paginator.html' with page_obj=page_obj %}
+        </div>  
+        {% endif %}  
       </div>
       <!-- /.card-body -->
     </div>
