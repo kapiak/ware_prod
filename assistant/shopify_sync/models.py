@@ -39,3 +39,28 @@ class ErrorSyncLog(BaseModel):
     class Meta:
         verbose_name = _("Error Sync Log")
         verbose_name_plural = _("Errors Sync Log")
+
+
+
+class EventStore(BaseModel):
+    """An event store which stores all the events coming in from the shopify webhooks"""
+
+    class StatusChoices(models.TextChoices):
+        RECEIVED = 'received', _("Received")
+        IN_PROCESS = 'in-process', _("In Process")
+        SUCCESS = 'success', _("Success")
+        FAILED = 'failed', _("Failed")
+
+    domain = models.CharField(verbose_name=_("Domain"), max_length=100, blank=True)
+    topic = models.CharField(verbose_name=_("Topic"), max_length=100, blank=True)
+    data = models.JSONField(blank=True, default=dict)
+
+    status = models.CharField(_("Status"), max_length=50, choices=StatusChoices.choices, default=StatusChoices.RECEIVED)
+    error_data = models.JSONField(verbose_name=_("Error Data"), default=dict, blank=True)
+
+    class Meta:
+        verbose_name = _("Event Store")
+        verbose_name_plural = _("Events Store")
+
+    def __str__(self):
+        return f"{self.domain} - {self.topic}"
