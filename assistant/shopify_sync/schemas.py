@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class VariantSchema(BaseModel):
-    variant_id: Optional[str]
+    id: Optional[str]
     product_id: Optional[str]
     title: str
     price: Decimal

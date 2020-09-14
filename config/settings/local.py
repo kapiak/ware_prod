@@ -11,7 +11,7 @@ SECRET_KEY = env(
     default="uG9wI8EIzsJvwb2lqNTrsdcNT5FOqal752kLdDgCtnIFnWDiau8k7lcmbA9bpOTt",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "504a9809eb50.ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "294b3111da4a.ngrok.io"]
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -33,7 +33,9 @@ EMAIL_PORT = 1025
 # WhiteNoise
 # ------------------------------------------------------------------------------
 # http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
-INSTALLED_APPS = ["whitenoise.runserver_nostatic"] + INSTALLED_APPS  # noqa F405
+INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic"
+] + INSTALLED_APPS  # noqa F405
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------

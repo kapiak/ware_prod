@@ -139,7 +139,7 @@ def process_product_update(event_id, domain, topic, data):
     event.save(update_fields=["status"])
     try:
         schema = ProductSchema(**data)
-        product_obj = Product.objects.get(metadata__shopify_id=schema.id)
+        product_obj = Product.objects.get(metadata__shopify_id=int(schema.id))
         update_product(
             product=product_obj,
             **schema.dict(
@@ -149,6 +149,7 @@ def process_product_update(event_id, domain, topic, data):
                     "title",
                     "slug",
                     "description",
+                    "variants",
                 }
             )
         )
@@ -168,15 +169,41 @@ def process_product_update(event_id, domain, topic, data):
             )
         else:
             for variant in schema.variants:
-                variant_obj = ProductVariant.objects.get(
-                    metadata__shopify_id=variant.id
-                )
-                update_product_variant(
-                    variant=variant_obj,
-                    **variant.dict(
-                        include={"title", "price", "sku", "barcode"}
+                output_string = 'NOCODE_' + ''.join(
+                    random.SystemRandom().choice(
+                        string.ascii_letters + string.digits
                     )
+                    for _ in range(10)
                 )
+                variant_obj = ProductVariant.objects.get(
+                    metadata__shopify_id=int(variant.id)
+                )
+                if not variant.sku or not variant.barcode:
+                    update_product_variant(
+                        variant=variant_obj,
+                        sku=output_string,
+                        barcode=output_string,
+                        **variant.dict(include={"title", "price"})
+                    )
+                elif not variant.sku:
+                    update_product_variant(
+                        variant=variant_obj,
+                        sku=output_string,
+                        **variant.dict(include={"title", "price", "barcode"})
+                    )
+                elif not variant.barcode:
+                    update_product_variant(
+                        variant=variant_obj,
+                        barcode=output_string,
+                        **variant.dict(include={"title", "price", "sku"})
+                    )
+                else:
+                    update_product_variant(
+                        variant=variant_obj,
+                        **variant.dict(
+                            include={"title", "price", "sku", "barcode"}
+                        )
+                    )
     except ValidationError as e:
         event.status = EventStore.StatusChoices.FAILED
         event.error_data = e.json()

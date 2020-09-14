@@ -32,7 +32,6 @@ def handle_webhook_received(sender, **kwargs):
 
 @receiver(signals.products_create)
 def handle_product_create(sender, **kwargs):
-    # print(sender, **kwargs)
     logger.info("Handling Product Create.")
     domain = kwargs.get('domain')
     topic = kwargs.get('topic')
@@ -43,7 +42,6 @@ def handle_product_create(sender, **kwargs):
 
 @receiver(signals.products_update)
 def handle_product_update(sender, **kwargs):
-    # logger.info(sender, **kwargs)
     logger.info("Handling Product Update.")
     domain = kwargs.get('domain')
     topic = kwargs.get('topic')
@@ -122,31 +120,31 @@ def handle_order_partially_fulfilled(sender, **kwargs):
     process_order_partially_fulfilled.delay(event.guid, domain, topic, data)
 
 
-@receiver(signals.checkouts_create)
-def handler_checkout_create(sender, **kwargs):
-    logger.info("Signal handler_checkout_create is Running")
+# @receiver(signals.checkouts_create)
+# def handler_checkout_create(sender, **kwargs):
+#     logger.info("Signal handler_checkout_create is Running")
 
 
-@receiver(signals.checkouts_update)
-def handler_checkout_update(sender, **kwargs):
-    logger.info("Signal handler_checkout_update is Running")
+# @receiver(signals.checkouts_update)
+# def handler_checkout_update(sender, **kwargs):
+#     logger.info("Signal handler_checkout_update is Running")
 
 
-@receiver(signals.draft_orders_create)
-def handler_draft_order_create(sender, **kwargs):
-    logger.info("Handling Draft Order Create.")
-    domain = kwargs.get('domain')
-    topic = kwargs.get('topic')
-    data = kwargs.get('data')
-    event = kwargs.get('event')
-    process_draft_order_create.delay(event.guid, domain, topic, data)
+# @receiver(signals.draft_orders_create)
+# def handler_draft_order_create(sender, **kwargs):
+#     logger.info("Handling Draft Order Create.")
+#     domain = kwargs.get('domain')
+#     topic = kwargs.get('topic')
+#     data = kwargs.get('data')
+#     event = kwargs.get('event')
+#     process_draft_order_create.delay(event.guid, domain, topic, data)
 
 
-@receiver(signals.draft_orders_update)
-def handler_draft_order_update(sender, **kwargs):
-    logger.info("Handling Draft Order Update.")
-    domain = kwargs.get('domain')
-    topic = kwargs.get('topic')
-    data = kwargs.get('data')
-    event = kwargs.get('event')
-    process_draft_order_update.delay(event.guid, domain, topic, data)
+# @receiver(signals.draft_orders_update)
+# def handler_draft_order_update(sender, **kwargs):
+#     logger.info("Handling Draft Order Update.")
+#     domain = kwargs.get('domain')
+#     topic = kwargs.get('topic')
+#     data = kwargs.get('data')
+#     event = kwargs.get('event')
+#     process_draft_order_update.delay(event.guid, domain, topic, data)

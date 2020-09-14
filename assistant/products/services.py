@@ -49,15 +49,15 @@ def update_product_variant(
     variant: Optional[Union[uuid.UUID, ProductVariant]],
     title: str,
     price: Decimal,
-    sku: Optional[str],
-    barcode: Optional[str]
+    sku: Optional[str] = None,
+    barcode: Optional[str] = None
 ) -> ProductVariant:
     if isinstance(variant, uuid.UUID):
         try:
             variant = ProductVariant.objects.get(guid=variant)
         except ProductVariant.DoesNotExist as e:
             logger.exception("Can't find Variant with uuid %s", e)
-    variant.title = title
+    variant.name = title
     variant.price = price
     if variant.sku:
         variant.sku = sku
@@ -97,10 +97,10 @@ def update_product(
     vendor: Union[str, Vendor],
     product_type: Union[str, ProductType],
     title: str,
-    slug: Optional[str],
-    description: Optional[str],
-    variants: Optional[List[Union[VariantSchema, ProductVariant]]],
-    additional_data: Optional[Dict]
+    slug: Optional[str] = None,
+    description: Optional[str] = None,
+    variants: Optional[List[Union[VariantSchema, ProductVariant]]] = [],
+    additional_data: Optional[Dict] = None
 ) -> Product:
     if isinstance(vendor, str):
         try:
