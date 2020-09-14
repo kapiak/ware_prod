@@ -4,6 +4,18 @@ from assistant.products.models import Supplier, ProductVariant
 from .models import PurchaseOrder, PurchaseOrderItem
 
 
+def process_add_to_purchase_order(
+    variant, purchase_order, **data
+) -> PurchaseOrder:
+    PurchaseOrderItem.objects.create(
+        purchase_order=purchase_order,
+        variant=variant,
+        quantity=data.get("quantity"),
+        status=PurchaseOrder.StatusChoices.DRAFT,
+    )
+    return purchase_order
+
+
 def process_purchase_order(variant, **data) -> PurchaseOrder:
     system_supplier = data.get("system_supplier", None)
     if system_supplier:
@@ -15,17 +27,10 @@ def process_purchase_order(variant, **data) -> PurchaseOrder:
         estimated_arrival=data["estimated_arrival"],
         supplier=supplier,
     )
-    purchase_order_item = PurchaseOrderItem.objects.create(
+    PurchaseOrderItem.objects.create(
         purchase_order=obj,
         variant=variant,
         quantity=data.get("quantity"),
         status=PurchaseOrder.StatusChoices.DRAFT,
     )
-    for sales_order in data.get("sales_orders"):
-        sales_order.purchase_order = purchase_order_item
-        sales_order.save()
     return obj
-
-
-def process_add_to_purchase_order(item, **kwargs):
-    pass

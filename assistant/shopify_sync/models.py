@@ -15,6 +15,7 @@ class ShopifySyncLog(BaseModel):
     class ObjectTypeChoices(models.TextChoices):
         PRODUCT = 'product', _('Product')
         ORDER = 'order', _('Order')
+        FULFILLMENT = 'fulfillment', _("Fulfillment")
 
     status_code = models.IntegerField(
         verbose_name=_("Status Code"), null=True, blank=True
@@ -64,3 +65,47 @@ class EventStore(BaseModel):
 
     def __str__(self):
         return f"{self.domain} - {self.topic}"
+
+    @property
+    def topic_icon(self):
+        icon_mapper = {
+            'app/uninstalled': "fas fa-clock bg-blue",
+            'carts/create': "fas fa-shopping-cart bg-blue",
+            'carts/update': "fas fa-shopping-cart bg-green",
+            'checkouts/create': "fas fa-clock bg-blue",
+            'checkouts/update': "fas fa-clock bg-blue",
+            'checkouts/delete': "fas fa-clock bg-red",
+            'collections/create': "fas fa-clock bg-blue",
+            'collections/update': "fas fa-clock bg-green",
+            'collections/delete': "fas fa-clock bg-red",
+            'customer_groups/create': "fas fa-user bg-blue",
+            'customer_groups/update': "fas fa-user bg-green",
+            'customer_groups/delete': "fas fa-user bg-red",
+            'customers/create': "fas fa-user bg-blue",
+            'customers/disable': "fas fa-user bg-yellow",
+            'customers/delete': "fas fa-user bg-red",
+            'customers/enable': "fas fa-user bg-green",
+            'customers/update': "fas fa-user bg-green",
+            'disputes/create': "fas fa-clock bg-blue",
+            'disputes/update': "fas fa-clock bg-green",
+            'fulfillments/create': "fas fa-truck-moving bg-blue",
+            'fulfillments/update': "fas fa-truck-moving bg-green",
+            'orders/create': "fas fa-shopping-basket bg-blue",
+            'orders/delete': "fas fa-shopping-basket bg-red",
+            'orders/updated': "fas fa-shopping-basket bg-green",
+            'orders/paid': "fas fa-shopping-basket bg-green",
+            'orders/cancelled': "fas fa-shopping-basket bg-red",
+            'orders/fulfilled': "fas fa-shopping-basket bg-green",
+            'orders/partially_fulfilled': "fas fa-shopping-basket bg-green",
+            'order_transactions/create': "fas fa-shopping-basket bg-blue",
+            'products/create': "fas fa-boxes bg-blue",
+            'products/update': "fas fa-boxes bg-green",
+            'products/delete': "fas fa-boxes bg-red",
+            'refunds/create': "fas fa-clock bg-blue",
+            'shop/update': "fas fa-clock bg-green",
+            'draft_orders_create': "fas fa-clock bg-blue",
+            'draft_orders_update': "fas fa-clock bg-green"
+        }
+        icon = icon_mapper.get(self.topic)
+        return icon
+        

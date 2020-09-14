@@ -1,10 +1,14 @@
 import logging
+from datetime import datetime
+from typing import Dict, List
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View
+from django.views.generic import ListView, View
+from pydantic import BaseModel
 
 from . import signals
 from .decorators import webhook
@@ -12,6 +16,13 @@ from .helpers import get_signal_name_for_topic
 from .models import EventStore
 
 logger = logging.getLogger(__name__)
+
+
+class StreamListView(LoginRequiredMixin, ListView):
+    template_name = "shopify_sync/stream.html"
+    queryset = EventStore.objects.all()
+    context_object_name = "events"
+
 
 
 class WebhookView(View):
@@ -40,13 +51,13 @@ class WebhookView(View):
         logger.info("Incoming %s webhook from shopify", signal_name)
         try:
             signals.webhook_received.send_robust(self, domain=request.webhook_domain, topic=request.webhook_topic, data=request.webhook_data)
-            logger.info("Incoming webhook. Domain: %s, Topic: %s, Data: %s", request.webhook_domain, request.webhook_topic, request.webhook_data)
+            logger.info("Incoming webhook Signal Fired. Domain: %s, Topic: %s", request.webhook_domain, request.webhook_topic)
             try:
-                EventStore.objects.create(domain=request.webhook_domain, topic=request.webhook_topic, data=request.webhook_data)
+                event = EventStore.objects.create(domain=request.webhook_domain, topic=request.webhook_topic, data=request.webhook_data)
+                getattr(signals, signal_name).send_robust(self, event=event, domain=request.webhook_domain, topic=request.webhook_topic, data=request.webhook_data)
+                logger.info("Signal %s fired", getattr(signals, signal_name))
             except Exception as e:
                 logger.info("Couldn't Store Event Data. %s", e)
-            getattr(signals, signal_name).send_robust(self, domain=request.webhook_domain, topic=request.webhook_topic, data=request.webhook_data)
-            logger.info("Signal %s fired",getattr(signals, signal_name))
         except AttributeError as e:
             logger.exception("Exception firing the webhook %s. Raised: %s", getattr(signals, signal_name), e)
             return HttpResponseBadRequest()

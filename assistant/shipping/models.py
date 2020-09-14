@@ -94,7 +94,10 @@ class ShippingMethod(BaseModel):
 
 
 class Shipment(index.Indexed, BaseModel, ClusterableModel):
-    """A fulfillment is record which represents the fulfillment of a set of order lines."""
+    """A fulfillment is record which represents the fulfillment of a set of order lines.
+    
+    TODO: Add combined shipments if the Shipping Address is Similar.
+    """
 
     number = models.CharField(
         verbose_name=_("Order Number"),

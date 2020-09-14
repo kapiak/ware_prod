@@ -72,8 +72,10 @@
                   <td>
                     <div class="input-group mb-3">
                         <div class="btn-group">
-                          <button href="#" type="button" class="btn btn-info receive-button">{% trans 'Receive' %}</button>
-                          <button type="button" class="btn btn-success">{% trans 'Add to Purchase' %}</button>
+                          <button type="button" 
+                                  data-guid="{{ item.guid }}"
+                                  data-url="{% url 'products:product-add-to-purchase' item.guid %}" 
+                                  class="btn purchase btn-success">{% trans 'Add to Purchase' %}</button>
                         </div>
                     </div>
                   </td>
@@ -93,4 +95,48 @@
     <!-- /.card -->
   </div>
 </div>
+<div id="modal"></div>
 {% endblock content %}
+
+{% block extra_body_js %}
+  <script>
+    document.querySelectorAll('.purchase').forEach( item => {
+      item.addEventListener('click', function(e) {
+        let url = e.target.getAttribute('data-url')
+        $.get({
+          url: url,
+          success: initModal
+        })
+      })
+    })
+  const initModal = function(res) {
+    $("#modal").html(res)
+      $('#addToPurchaseModal').modal('show'); 
+      $("form").on("submit", function(e) {
+        e.preventDefault()
+        $.ajax({
+            url: this.getAttribute('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: handlePostSubmitSuccess
+        })
+    })
+  }
+  const handlePostSubmitSuccess = function (res) {
+    if ( res.valid === true) {
+      $(document).Toasts('create', {
+        title: "{% trans 'Success' %}",
+        body: res.title,
+        autohide: true,
+        delay: 3000,
+        class: "bg-success"
+      });
+      $('#addToPurchaseModal').modal('toggle');
+    } else {
+      $("#modal").html(res)
+      $("#addToPurchaseModal").modal('show');
+      initModal()
+    }
+  }
+  </script>
+{% endblock %}

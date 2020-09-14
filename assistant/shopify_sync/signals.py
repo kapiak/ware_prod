@@ -7,8 +7,8 @@ class WebhookSignal(Signal):
     """
 
     def __init__(self):
-        providing_args = ['domain', 'topic', 'data']
-        super(WebhookSignal, self).__init__(providing_args=providing_args)
+        providing_args = ['event', 'domain', 'topic', 'data']
+        super().__init__(providing_args=providing_args)
 
 
 # Define a generic webhook_received signal that triggers for all webhooks.

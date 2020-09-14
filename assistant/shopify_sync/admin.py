@@ -31,6 +31,7 @@ admin.site.register(ErrorSyncLog, ErrorSyncLogAdmin)
 
 class EventStoreAdmin(admin.ModelAdmin):
     list_display = ("topic", "domain", "status", "created_at", "updated_at", "data_prettified")
+    list_filter = ("topic",)
 
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget}
