@@ -3,11 +3,12 @@ import uuid
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from rest_framework.decorators import api_view
-from rest_framework.request import Request
-from rest_framework.response import Response
+from django.http import HttpRequest, HttpResponse, JsonResponse
 
 from .models import PurchaseOrder, PurchaseOrderItem
-# from .services import receive_stock
+from .forms import ReceiveItemForm
+
+from .services import receive_stock
 
 
 class PurchaseListView(ListView):
@@ -17,14 +18,22 @@ class PurchaseListView(ListView):
     paginate_by = 100
 
     def get_queryset(self):
-        qs = super().get_queryset().select_related("supplier").prefetch_related("items")
+        qs = (
+            super()
+            .get_queryset()
+            .select_related("supplier")
+            .prefetch_related("items")
+        )
         return qs
 
 
-@api_view(["GET"])
-def purchase_receive_endpoint(
-    request: Request, item_guid: uuid.UUID, quantity: int
-) -> Response:
-    item = get_object_or_404(PurchaseOrderItem, guid=item_guid)
-    # receive_stock(item=item, quantity=quantity)
-    return Response({})
+def recieve_item(request: HttpRequest, guid: uuid.UUID) -> JsonResponse:
+    print(request.POST)
+    if request.method == 'POST':
+        item = get_object_or_404(PurchaseOrderItem, guid=guid)
+        form = ReceiveItemForm(item=item, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'error', 'errors': form.errors})
+    return JsonResponse({'status': 'method not allowed'})

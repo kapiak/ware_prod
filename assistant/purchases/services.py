@@ -4,6 +4,16 @@ from assistant.products.models import Supplier, ProductVariant
 from .models import PurchaseOrder, PurchaseOrderItem
 
 
+def receive_stock(item: PurchaseOrderItem, quantity: int) -> PurchaseOrderItem:
+    item.received = quantity
+    if item.quantity > item.received:
+        item.status = PurchaseOrderItem.StatusChoices.PARTIAL
+    else:
+        item.status = PurchaseOrder.StatusChoices.RECEIVED
+    item.save(update_fields=['received', 'status'])
+    return item
+
+
 def process_add_to_purchase_order(
     variant, purchase_order, **data
 ) -> PurchaseOrder:

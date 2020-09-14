@@ -11,6 +11,7 @@ from .models import PurchaseOrder
 from assistant.purchases.services import (
     process_add_to_purchase_order,
     process_purchase_order,
+    receive_stock,
 )
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,10 @@ class PurchaseOrderForm(forms.Form):
             obj = process_add_to_purchase_order(
                 variant=self.variant, **self.cleaned_data
             )
-        obj = process_purchase_order(variant=self.variant, **self.cleaned_data)
+        else:
+            obj = process_purchase_order(
+                variant=self.variant, **self.cleaned_data
+            )
         return obj
 
     def clean(self):
@@ -64,3 +68,17 @@ class PurchaseOrderForm(forms.Form):
                 ),
                 code="invalid",
             )
+
+
+class ReceiveItemForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.item = kwargs.pop("item")
+        super().__init__(**kwargs)
+
+    quantity = forms.IntegerField()
+
+    def save(self):
+        item = receive_stock(
+            item=self.item, quantity=self.cleaned_data['quantity']
+        )
+        return item
