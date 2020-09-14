@@ -31,9 +31,7 @@ class WeightUnits:
 class DistanceUnits:
     CENTIMETER = 'centimetre'
 
-    CHOICES = [
-        (CENTIMETER, "centimetre")
-    ]
+    CHOICES = [(CENTIMETER, "centimetre")]
 
 
 class Vendor(index.Indexed, BaseModel):
@@ -86,7 +84,10 @@ class ProductType(index.Indexed, BaseModel):
     )
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
     weight = MeasurementField(
-        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
+        measurement=Weight,
+        unit_choices=WeightUnits.CHOICES,
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -108,14 +109,20 @@ class Product(index.Indexed, BaseModel, ClusterableModel):
     """
 
     product_type = models.ForeignKey(
-        ProductType, related_name="products", on_delete=models.SET_NULL, null=True,
+        ProductType,
+        related_name="products",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     title = models.CharField(max_length=200, blank=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
     description = RichTextField(blank=True, null=True)
     weight = MeasurementField(
-        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
+        measurement=Weight,
+        unit_choices=WeightUnits.CHOICES,
+        blank=True,
+        null=True,
     )
 
     max_price = MoneyField(
@@ -174,12 +181,16 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
     * A variant is in stock, if it has unallocated quantity.
     """
 
-    product = ParentalKey(Product, related_name="variants", on_delete=models.CASCADE)
+    product = ParentalKey(
+        Product, related_name="variants", on_delete=models.CASCADE
+    )
 
     sku = models.CharField(
         verbose_name=_("SKU (Stock Keeping Unit)"), max_length=255, unique=True
     )
-    barcode = models.CharField(verbose_name=_("Barcode"), max_length=255, unique=True)
+    barcode = models.CharField(
+        verbose_name=_("Barcode"), max_length=255, unique=True
+    )
     name = models.CharField(verbose_name=_("Name"), max_length=255, blank=True)
     price = MoneyField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -194,23 +205,35 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
         blank=True,
     )
     weight = MeasurementField(
-        measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
+        measurement=Weight,
+        unit_choices=WeightUnits.CHOICES,
+        blank=True,
+        null=True,
     )
     width = MeasurementField(
-        measurement=Distance, unit_choices=DistanceUnits.CHOICES, blank=True, null=True
+        measurement=Distance,
+        unit_choices=DistanceUnits.CHOICES,
+        blank=True,
+        null=True,
     )
     height = MeasurementField(
-        measurement=Distance, unit_choices=DistanceUnits.CHOICES, blank=True, null=True
+        measurement=Distance,
+        unit_choices=DistanceUnits.CHOICES,
+        blank=True,
+        null=True,
     )
     depth = MeasurementField(
-        measurement=Distance, unit_choices=DistanceUnits.CHOICES, blank=True, null=True
+        measurement=Distance,
+        unit_choices=DistanceUnits.CHOICES,
+        blank=True,
+        null=True,
     )
     declared_value = MoneyField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,
         default_currency=settings.DEFAULT_CURRENCY,
         blank=True,
-        null=True
+        null=True,
     )
     metadata = models.JSONField(default=dict, blank=True)
 
@@ -224,7 +247,11 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
         return self.name or self.sku
 
     def get_weight(self) -> "Weight":
-        return self.weight or self.product.weight or self.product.product_type.weight
+        return (
+            self.weight
+            or self.product.weight
+            or self.product.product_type.weight
+        )
 
     def get_first_image(self) -> "ProductImage":
         images = list(self.images.all())
@@ -232,7 +259,9 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
 
     @property
     def available_stock(self):
-        val = self.stocks.aggregate(quantity=models.Sum("quantity"))["quantity"]
+        val = self.stocks.aggregate(quantity=models.Sum("quantity"))[
+            "quantity"
+        ]
         return val or 0
 
     @property
@@ -258,7 +287,17 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
 
     @property
     def in_purchase(self):
-        return PurchaseOrderItem.objects.filter(variant=self).aggregate(quantity=models.Sum("quantity"))["quantity"] or 0
+        return (
+            PurchaseOrderItem.objects.filter(
+                variant=self,
+                status__in=[
+                    PurchaseOrderItem.StatusChoices.SUBMITTED,
+                    PurchaseOrderItem.StatusChoices.DRAFT,
+                ],
+            ).aggregate(quantity=models.Sum("quantity"))["quantity"]
+            or 0
+        )
+
 
 class ProductImage(Orderable, BaseModel):
     product = models.ForeignKey(
@@ -271,7 +310,9 @@ class ProductImage(Orderable, BaseModel):
         on_delete=models.SET_NULL,
         related_name="+",
     )
-    alt = models.CharField(verbose_name=_("Image Alt Text"), max_length=128, blank=True)
+    alt = models.CharField(
+        verbose_name=_("Image Alt Text"), max_length=128, blank=True
+    )
 
     class Meta:
         verbose_name = _("Product Image")
@@ -283,7 +324,9 @@ class ProductImage(Orderable, BaseModel):
 
 class VariantImage(models.Model):
     variant = models.ForeignKey(
-        "ProductVariant", related_name="variant_images", on_delete=models.CASCADE,
+        "ProductVariant",
+        related_name="variant_images",
+        on_delete=models.CASCADE,
     )
     image = models.ForeignKey(
         ProductImage, related_name="variant_images", on_delete=models.CASCADE

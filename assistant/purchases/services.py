@@ -1,6 +1,7 @@
 from sequences import get_next_value
 
 from assistant.products.models import Supplier, ProductVariant
+from assistant.warehouse.models import Stock, Warehouse
 from .models import PurchaseOrder, PurchaseOrderItem
 
 
@@ -11,6 +12,20 @@ def receive_stock(item: PurchaseOrderItem, quantity: int) -> PurchaseOrderItem:
     else:
         item.status = PurchaseOrder.StatusChoices.RECEIVED
     item.save(update_fields=['received', 'status'])
+    # for now we only have one warehouse to deal with so this will do.
+    stocks = Stock.objects.filter(product_variant=item.variant)
+    warehouses = Warehouse.objects.all()
+    if not warehouses.exists():
+        warehouse = Warehouse.objects.create(name="default")
+    else:
+        warehouse = warehouses.first()
+    if not stocks.exists():
+        stock = Stock.objects.create(
+            warehouse=warehouse, product_variant=item.variant, quantity=0,
+        )
+    else:
+        stock = stocks.first()
+    stock.increase_stock(quantity=quantity, commit=True)
     return item
 
 
