@@ -1,4 +1,5 @@
 from sequences import get_next_value
+from django.db.models import F
 
 from assistant.products.models import Supplier, ProductVariant
 from assistant.warehouse.models import Stock, Warehouse
@@ -6,11 +7,11 @@ from .models import PurchaseOrder, PurchaseOrderItem
 
 
 def receive_stock(item: PurchaseOrderItem, quantity: int) -> PurchaseOrderItem:
-    item.received = quantity
-    if item.quantity > item.received:
+    if item.quantity > quantity + item.received:
         item.status = PurchaseOrderItem.StatusChoices.PARTIAL
     else:
         item.status = PurchaseOrder.StatusChoices.RECEIVED
+    item.received = quantity + F('received')
     item.save(update_fields=['received', 'status'])
     # for now we only have one warehouse to deal with so this will do.
     stocks = Stock.objects.filter(product_variant=item.variant)
