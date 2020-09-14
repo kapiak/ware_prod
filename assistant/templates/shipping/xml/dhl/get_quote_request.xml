@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:DCTRequest xmlns:p="http://www.dhl.com" xmlns:p1="http://www.dhl.com/datatypes" xmlns:p2="http://www.dhl.com/DCTRequestdatatypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dhl.com DCT-req.xsd ">
+  <GetQuote>
+    <Request>
+      <ServiceHeader>
+        <MessageTime>{{ time }}</MessageTime>
+        <MessageReference>12345678910123456789012345678</MessageReference>
+            <SiteID>v62_avzK01cyFW</SiteID>
+            <Password>UJhiXBI9pw</Password>
+      </ServiceHeader>
+    </Request>
+    <From>
+      <CountryCode>MY</CountryCode>
+      <Postalcode>47800</Postalcode>
+    </From>
+    <BkgDetails>
+      <PaymentCountryCode>SG</PaymentCountryCode>
+      <Date>2020-10-24</Date>
+      <ReadyTime>PT10H21M</ReadyTime>
+      <ReadyTimeGMTOffset>+01:00</ReadyTimeGMTOffset>
+      <DimensionUnit>CM</DimensionUnit>
+      <WeightUnit>KG</WeightUnit>
+      <Pieces>
+        <Piece>
+          <PieceID>1</PieceID>
+          <Height>1</Height>
+          <Depth>1</Depth>
+          <Width>1</Width>
+          <Weight>5.0</Weight>
+        </Piece>
+      </Pieces> 
+	  <PaymentAccountNumber>CASHSIN</PaymentAccountNumber>	  
+      <IsDutiable>N</IsDutiable>
+      <NetworkTypeCode>AL</NetworkTypeCode>
+	  <QtdShp>
+		 <GlobalProductCode>D</GlobalProductCode>
+	     <LocalProductCode>D</LocalProductCode>		
+	     <QtdShpExChrg>
+            <SpecialServiceType>AA</SpecialServiceType>
+         </QtdShpExChrg>
+	  </QtdShp>
+    </BkgDetails>
+    <To>
+      <CountryCode>AU</CountryCode>
+      <Postalcode>2007</Postalcode>
+    </To>
+   <Dutiable>
+      <DeclaredCurrency>EUR</DeclaredCurrency>
+      <DeclaredValue>1.0</DeclaredValue>
+    </Dutiable>
+  </GetQuote>
+</p:DCTRequest>

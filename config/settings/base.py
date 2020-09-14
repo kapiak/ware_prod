@@ -62,7 +62,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "django.contrib.humanize", # Handy template tags
+    "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
 ]
@@ -119,6 +119,7 @@ LOCAL_APPS = [
     "assistant.orders.apps.OrdersConfig",
     "assistant.warehouse.apps.WarehouseConfig",
     "assistant.purchases.apps.PurchasesConfig",
+    "assistant.shipping.apps.ShippingConfig",
     "assistant.weblink_channel.apps.WeblinkChannelConfig",
     # Your stuff: custom apps go here
     "assistant.shopify_sync.apps.ShopifySyncConfig",
@@ -359,7 +360,7 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_TIME_LIMIT = 5 * 60
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-soft-time-limit
 # TODO: set to whatever value is adequate in your circumstances
-CELERY_TASK_SOFT_TIME_LIMIT = 60
+CELERY_TASK_SOFT_TIME_LIMIT = 300
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
@@ -410,3 +411,4 @@ SHOPIFY_STORE_URL = env("SHOPIFY_STORE_URL")
 SHOPIFY_API_VERSION = env("SHOPIFY_API_VERSION")
 SHOPIFY_EXAMPLE_URL = env("SHOPIFY_EXAMPLE_URL")
 SHOPIFY_STORE_NAME = env("SHOPIFY_STORE_NAME")
+SHOPIFY_WEBHOOK_SECRET = env("SHOPIFY_WEBHOOK_SECRET", default="c2fdf9f7aabec599daff6c1583571c4ef34af87ab9a9e866ce5be315ec68f391")

@@ -1,17 +1,17 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey
-from wagtail.core.models import Orderable
-from wagtail.search import index
-from wagtail.core.fields import RichTextField
 from django_measurement.models import MeasurementField
 from djmoney.models.fields import MoneyField
-from measurement.measures import Weight
+from measurement.measures import Weight, Distance
+from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
+from wagtail.core.fields import RichTextField
+from wagtail.core.models import Orderable
+from wagtail.search import index
 
 from assistant.core.models import BaseModel
+from assistant.purchases.models import PurchaseOrderItem
 
 
 class WeightUnits:
@@ -25,6 +25,14 @@ class WeightUnits:
         (POUND, "lb"),
         (OUNCE, "oz"),
         (GRAM, "g"),
+    ]
+
+
+class DistanceUnits:
+    CENTIMETER = 'centimetre'
+
+    CHOICES = [
+        (CENTIMETER, "centimetre")
     ]
 
 
@@ -95,6 +103,8 @@ class Product(index.Indexed, BaseModel, ClusterableModel):
     If the product variant has no overridden property 
     (for example: price specifically set for this variant), 
     the default value is taken from the product.
+    
+    TODO: Add Field HS_CODE, required
     """
 
     product_type = models.ForeignKey(
@@ -122,6 +132,7 @@ class Product(index.Indexed, BaseModel, ClusterableModel):
     vendor = models.ForeignKey(
         Vendor, related_name="products", on_delete=models.CASCADE, null=True
     )
+    metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
         verbose_name = _("Product")
@@ -185,6 +196,22 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
     weight = MeasurementField(
         measurement=Weight, unit_choices=WeightUnits.CHOICES, blank=True, null=True,
     )
+    width = MeasurementField(
+        measurement=Distance, unit_choices=DistanceUnits.CHOICES, blank=True, null=True
+    )
+    height = MeasurementField(
+        measurement=Distance, unit_choices=DistanceUnits.CHOICES, blank=True, null=True
+    )
+    depth = MeasurementField(
+        measurement=Distance, unit_choices=DistanceUnits.CHOICES, blank=True, null=True
+    )
+    declared_value = MoneyField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        default_currency=settings.DEFAULT_CURRENCY,
+        blank=True,
+        null=True
+    )
     metadata = models.JSONField(default=dict, blank=True)
 
     images = models.ManyToManyField("ProductImage", through="VariantImage")
@@ -205,7 +232,7 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
 
     @property
     def available_stock(self):
-        val = self.stocks.aggregate(quantity=models.Sum("quantity"))
+        val = self.stocks.aggregate(quantity=models.Sum("quantity"))["quantity"]
         return val or 0
 
     @property
@@ -226,21 +253,12 @@ class ProductVariant(index.Indexed, Orderable, BaseModel):
                 Order.StatusChoices.FULFILLED,
                 Order.StatusChoices.CANCELED,
             ]
-        ).aggregate(quantity=models.Sum("quantity"))
+        ).aggregate(quantity=models.Sum("quantity"))['quantity']
         return val or 0
 
     @property
     def in_purchase(self):
-        from assistant.orders.models import Order
-
-        val = self.order_lines.exclude(
-            order__status__in=[
-                Order.StatusChoices.FULFILLED,
-                Order.StatusChoices.CANCELED,
-            ]
-        ).aggregate(quantity=models.Sum("purchase_order__quantity"))
-        return val or 0
-
+        return PurchaseOrderItem.objects.filter(variant=self).aggregate(quantity=models.Sum("quantity"))["quantity"] or 0
 
 class ProductImage(Orderable, BaseModel):
     product = models.ForeignKey(

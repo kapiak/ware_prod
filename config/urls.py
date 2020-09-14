@@ -24,11 +24,15 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     path("pages/", include("assistant.pages.urls", namespace="pages")),
     path("products/", include("assistant.products.urls", namespace="products")),
-    path("warehouse/", include("assistant.warehouse.urls", namespace="warehouse"),),
+    path("purchases/", include("assistant.purchases.urls", namespace="purchases")),
+    path("orders/", include("assistant.orders.urls", namespace="orders")),
+    path("warehouse/", include("assistant.warehouse.urls", namespace="warehouse")),
+    path("shipping/", include("assistant.shipping.urls", namespace="shipping")),
     path(
         "weblink-channel/",
         include("assistant.weblink_channel.urls", namespace="weblink_channel"),
     ),
+    path("shopify/", include("assistant.shopify_sync.urls"), name="shopify_sync"),
     path("api/", include("config.api_router")),
     path("auth-token/", obtain_auth_token),
     # Wagtail CMS

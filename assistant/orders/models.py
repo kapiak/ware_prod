@@ -55,7 +55,7 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
         # order with no items marked as fulfilled
         UNFULFILLED = "unfulfilled", _("Unfulfilled")
         # order with some items marked as fulfilled
-        PARTIALLY_FULFILLED = "partially fulfilled", _("Partially Fulfilled")
+        PARTIALLY_FULFILLED = "partially_fulfilled", _("Partially Fulfilled")
         # order with all items marked as fulfilled
         FULFILLED = "fulfilled", _("Fulfilled")
         # permanently canceled order
@@ -185,10 +185,16 @@ class Order(index.Indexed, BaseModel, ClusterableModel):
         null=True,
         help_text=_("The date and time when the order was closed."),
     )
+    metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
+
+    @property
+    def fully_allocated(self):
+        fully_allocated = [True if item.fully_allocated else False for item in self.lines.all()]
+        return all(fully_allocated)
 
 
 class LineItem(index.Indexed, Orderable, BaseModel):
@@ -220,8 +226,16 @@ class LineItem(index.Indexed, Orderable, BaseModel):
         return self.quantity - self.quantity_fulfilled
 
     @property
+    def unallocated_quantity(self):
+        return self.quantity - self.allocated
+
+    @property
     def allocated(self):
-        return self.allocations.aggregate(allocated=Sum("quantity_allocated"))
+        return self.allocations.aggregate(allocated=Sum("quantity_allocated"))["allocated"] or 0
+
+    @property
+    def fully_allocated(self):
+        return self.allocated == self.quantity
 
     @property
     def requires(self):

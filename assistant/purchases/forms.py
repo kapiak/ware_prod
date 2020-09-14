@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from assistant.products.models import Supplier
 from assistant.orders.models import Order, LineItem
+from .models import PurchaseOrder
 
 from assistant.purchases.services import (
     process_add_to_purchase_order,
@@ -17,29 +18,49 @@ logger = logging.getLogger(__name__)
 
 class PurchaseOrderForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        variant = kwargs.pop("variant")
+        self.variant = kwargs.pop("variant")
         super().__init__(**kwargs)
-        self.fields["sales_orders"].queryset = LineItem.objects.filter(variant=variant)
 
-    supplier = forms.CharField(label=_("Supplier"), required=False)
-    system_supplier = forms.ModelChoiceField(
-        label=_("Supplier"), queryset=Supplier.objects.all(), required=False
+    supplier = forms.CharField(
+        label=_("New Supplier"),
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
     )
-    estimated_arrival = forms.IntegerField()
-    quantity = forms.IntegerField()
-    sales_orders = forms.ModelMultipleChoiceField(
-        queryset=LineItem.objects.none(),
-        help_text=_("Press Ctrl when selecting multiple sales orders"),
+    system_supplier = forms.ModelChoiceField(
+        label=_("Existing Supplier"),
+        queryset=Supplier.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+    estimated_arrival = forms.IntegerField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    quantity = forms.IntegerField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    purchase_order = forms.ModelChoiceField(
+        label=_("Purchase Order"),
+        queryset=PurchaseOrder.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
     )
 
     def save(self):
-        obj = process_purchase_order(**self.cleaned_data)
+        if self.cleaned_data["purchase_order"]:
+            obj = process_add_to_purchase_order(
+                variant=self.variant, **self.cleaned_data
+            )
+        obj = process_purchase_order(variant=self.variant, **self.cleaned_data)
         return obj
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get("system_supplier") and not cleaned_data.get("supplier"):
+        if not cleaned_data.get("system_supplier") and not cleaned_data.get(
+            "supplier"
+        ):
             raise forms.ValidationError(
-                _("Invalid value: One of the Supplier Fields should be provided"),
+                _(
+                    "Invalid value: One of the Supplier Fields should be provided"
+                ),
                 code="invalid",
             )
