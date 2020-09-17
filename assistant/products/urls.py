@@ -7,12 +7,14 @@ from .views import (
     receive_product_stock,
     ProductListView,
     product_add_to_purchase,
+    product_search,
 )
 
 app_name = "products"
 
 urlpatterns = [
     path('', ProductListView.as_view(), name="product-list"),
+    path('search/', product_search, name="product-search"),
     path(
         'add-to-purchase/<uuid:guid>/',
         product_add_to_purchase,

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.template.loader import render_to_string
 from wagtail.admin.modal_workflow import render_modal_workflow
 
 from assistant.orders.models import LineItem, Order
@@ -173,6 +174,19 @@ class ProductListView(ListView):
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related("variants")
         return qs
+
+
+def product_search(request: HttpRequest) -> HttpResponse:
+    query = request.GET.get('q', None)
+    qs = Product.objects.none()
+    if query:
+        qs = Product.objects.filter(
+            Q(metadata__shopify_id__startswith=query)
+            | Q(variants__metadata__shopify_id__startswith=query)
+            | Q(title__startswith=query)
+        )
+    context = {'products': qs}
+    return render(request, "core/search_dropdown.html", context)
 
 
 def product_add_to_purchase(
