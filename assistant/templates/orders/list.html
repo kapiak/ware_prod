@@ -40,6 +40,7 @@
             <tr>
               <th class="m-w-50">{% trans 'Number' %}</th>
               <th>{% trans 'Customer' %}</th>
+              <th>{% trans 'Status' %}</th>
               <th>{% trans 'Type' %}</th>
               <th>{% trans 'Total Price' %}</th>
               <th>{% trans 'Actions' %}</th>
@@ -49,16 +50,24 @@
             {% for order in orders %}
                 <tr class="nested-table">
                     <td>
-                        <h3 class="bold">{{ order.number }}</h3>
+                        <h3 class="bold">
+                          {{ order.number }}<br />
+                          <small>Harum.io ID: {{ order.metadata.shopify_id }}</small>
+                        </h3>
                         <br>
                         <small>{% trans 'created on' %} {{ order.created_at|naturalday }}</small>
                     </td>
                     <td>
+                      {{ order.customer_email }}<br />
                         {%if order.user %}
                             {{ order.user.fullname }}
                         {% else %}
                             {{ order.customer }}
                         {% endif %}
+                    </td>
+                    <td>
+                      {{ order.get_financial_status_display }}<br />
+                      {{ order.get_status_display }}
                     </td>
                     <td>{{ order.get_type_display }}</td>
                     <td>{{ order.total_price }}</td>
@@ -76,6 +85,8 @@
                           {{ line.variant.sku }}
                           <br />
                           {{ line.variant.name }}
+                          <br />
+                          <small>Harm.io ID: {{ line.variant.metadata.shopify_id }}</small>
                         </td>
                         <td>
                             <dl class="row">
