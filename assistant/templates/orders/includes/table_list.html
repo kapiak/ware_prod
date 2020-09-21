@@ -1,0 +1,87 @@
+{% load static i18n humanize %}
+<table class="table table-hover text-nowrap">
+  <thead>
+    <tr>
+      <th class="m-w-50">{% trans 'Number' %}</th>
+      <th>{% trans 'Customer' %}</th>
+      <th>{% trans 'Status' %}</th>
+      <th>{% trans 'Type' %}</th>
+      <th>{% trans 'Total Price' %}</th>
+      <th>{% trans 'Actions' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+        <tr class="nested-table">
+            <td>
+                <h3 class="bold">
+                  <small>Harum.io Order: # {{ order.metadata.shopify_order_number }}</small><br />
+                  {{ order.number }}<br />
+                  <small>Harum.io ID: {{ order.metadata.shopify_id }}</small><br />
+                </h3>
+                <br>
+                <small>{% trans 'created on' %} {{ order.created_at|naturalday }}</small>
+            </td>
+            <td>
+              {{ order.customer_email }}<br />
+                {%if order.user %}
+                    {{ order.user.fullname }}
+                {% else %}
+                    {{ order.customer }}
+                {% endif %}
+            </td>
+            <td>
+              {{ order.get_financial_status_display }}<br />
+              {{ order.get_status_display }}
+            </td>
+            <td>{{ order.get_type_display }}</td>
+            <td>{{ order.total_price }}</td>
+            <td>
+                <div class="btn-group">
+                    {% if order.fully_allocated %}
+                      {% comment %} <a href="{% url 'shipping:shipment_detail' order.shipments.first.guid %}" class="btn btn-block btn-outline-primary btn-lg">{% trans 'View Shipment' %}</a> {% endcomment %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% for line in order.lines.all %}
+            <tr>
+                <td colspan="2">
+                  {{ line.variant.sku }}
+                  <br />
+                  {{ line.variant.name }}
+                  <br />
+                  <small>Harm.io ID: {{ line.variant.metadata.shopify_id }}</small>
+                </td>
+                <td>
+                    <dl class="row">
+                        <dt class="col-sm-4 light-text">{% trans 'Order Quantity:' %}</dt>
+                        <dd class="col-sm-8">{{ line.quantity }}</dd>
+
+                        <dt class="col-sm-4 light-text">{% trans 'Fulfilled Quantity:' %}</dt>
+                        <dd class="col-sm-8">{{ line.quantity_fulfilled }}</dd>
+
+                        <dt class="col-sm-4 light-text">{% trans 'Available Quantity:' %}</dt>
+                        <dd class="col-sm-8">{{ line.variant.available_stock }}</dd>
+
+                        <dt class="col-sm-4 light-text">{% trans 'Allocated Quantity:' %}</dt>
+                        <dd class="col-sm-8">{{ line.allocated }}</dd>
+                    </dl>
+                <td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" 
+                                class="btn btn-outline-secondary btn-sm add-to-purchase" 
+                                data-url="{% url 'orders:add_to_purchase_modal' line.variant.guid %}"
+                                data-sku="{{ line.variant.sku }}">{% trans 'Add to Purchase' %}</button>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+<!-- /.card-body -->
+<div class="card-footer clearfix">
+    {% include 'core/includes/paginator.html' with page_obj=page_obj %}
+</div>  
