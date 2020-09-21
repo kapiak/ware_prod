@@ -1,46 +1,59 @@
 {% load i18n humanize %}
-
-{% for product in products %}
-  <tr class="nested-table">
-  <td>
-    <h3 class="bold">
-      {{ product.title }}<br />
-      <small>Harum.io ID: {{ product.metadata.shopify_id }}</small>
-      </h3>
-      <br>
-      <small>{% trans 'created on' %} {{ product.created_at|naturalday }}</small>  
-    </td>
-    <td>{{ product.vendor }}</td>
-    <td>{{ product.product_type }}</td>
-  </tr>
-  {% for item in product.variants.all %}
-  <tr>
-    <td colspan="1">
-      {{ item.sku }}<br />
-      <small>Harum.io ID: {{ item.metadata.shopify_id }}</small>
-    </td>
+<table class="table table-hover text-nowrap">
+  <thead>
+    <tr>
+      <th class="m-w-50">{% trans 'Title' %}</th>
+      <th>{% trans 'Vendor' %}</th>
+      <th>{% trans 'Type' %}</th>
+    </tr>
+  </thead>
+  <tbody id="id_tbody">
+  {% for product in products %}
+    <tr class="nested-table">
     <td>
-      <dl class="row">
-        <dt class="col-sm-4">{% trans 'To Purchase:' %}</dt>
-        <dd class="col-sm-8">{{ item.needed_stock }}</dd>
+      <h3 class="bold">
+        {{ product.title }}<br />
+        <small>Harum.io ID: {{ product.metadata.shopify_id }}</small>
+        </h3>
+        <br>
+        <small>{% trans 'created on' %} {{ product.created_at|naturalday }}</small>  
+      </td>
+      <td>{{ product.vendor }}</td>
+      <td>{{ product.product_type }}</td>
+    </tr>
+    {% for item in product.variants.all %}
+    <tr>
+      <td colspan="1">
+        {{ item.sku }}<br />
+        <small>Harum.io ID: {{ item.metadata.shopify_id }}</small>
+      </td>
+      <td>
+        <dl class="row">
+          <dt class="col-sm-4">{% trans 'To Purchase:' %}</dt>
+          <dd class="col-sm-8">{{ item.needed_stock }}</dd>
 
-        <dt class="col-sm-4">{% trans 'In Purchase:' %}</dt>
-        <dd class="col-sm-8">{{ item.in_purchase }}</dd>
+          <dt class="col-sm-4">{% trans 'In Purchase:' %}</dt>
+          <dd class="col-sm-8">{{ item.in_purchase }}</dd>
 
-        <dt class="col-sm-4">{% trans 'Available Quantity:' %}</dt>
-        <dd class="col-sm-8">{{ item.available_stock }}</dd>
-      </dl>
-    </td>
-    <td>
-      <div class="input-group mb-3">
-          <div class="btn-group">
-            <button type="button" 
-                    data-guid="{{ item.guid }}"
-                    data-url="{% url 'products:product-add-to-purchase' item.guid %}" 
-                    class="btn purchase btn-success">{% trans 'Add to Purchase' %}</button>
-          </div>
-      </div>
-    </td>
-  <tr>
+          <dt class="col-sm-4">{% trans 'Available Quantity:' %}</dt>
+          <dd class="col-sm-8">{{ item.available_stock }}</dd>
+        </dl>
+      </td>
+      <td>
+        <div class="input-group mb-3">
+            <div class="btn-group">
+              <button type="button" 
+                      data-guid="{{ item.guid }}"
+                      data-url="{% url 'products:product-add-to-purchase' item.guid %}" 
+                      class="btn purchase btn-success">{% trans 'Add to Purchase' %}</button>
+            </div>
+        </div>
+      </td>
+    <tr>
+    {% endfor %}
   {% endfor %}
-{% endfor %}
+  </tbody>
+</table>
+<div class="card-footer clearfix">
+    {% include 'core/includes/paginator.html' with page_obj=page_obj %}
+</div>  

@@ -51,8 +51,9 @@
                 <tr class="nested-table">
                     <td>
                         <h3 class="bold">
+                          <small>Harum.io Order: # {{ order.metadata.shopify_order_number }}</small><br />
                           {{ order.number }}<br />
-                          <small>Harum.io ID: {{ order.metadata.shopify_id }}</small>
+                          <small>Harum.io ID: {{ order.metadata.shopify_id }}</small><br />
                         </h3>
                         <br>
                         <small>{% trans 'created on' %} {{ order.created_at|naturalday }}</small>

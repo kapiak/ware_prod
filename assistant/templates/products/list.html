@@ -18,11 +18,12 @@
 
         <div class="card-tools">
           <div class="input-group input-group-sm" style="width: 150px">
-            <form method="GET" action="{% url 'products:product-search' %}">
+            <form method="GET" action="{% url 'products:product-list' %}">
               <input
                 type="text"
                 name="q"
                 id="id_search"
+                value="{{ q }}"
                 class="form-control float-right"
                 placeholder="Search"
               />
@@ -37,24 +38,8 @@
         </div>
       </div>
       <!-- /.card-header -->
-      <div class="card-body table-responsive p-0">
-        <table class="table table-hover text-nowrap">
-          <thead>
-            <tr>
-              <th class="m-w-50">{% trans 'Title' %}</th>
-              <th>{% trans 'Vendor' %}</th>
-              <th>{% trans 'Type' %}</th>
-            </tr>
-          </thead>
-          <tbody id="id_tbody">
-            {% include 'products/includes/table_list.html' %}
-          </tbody>
-        </table>
-        {% if is_paginated %}
-        <div class="card-footer clearfix">
-            {% include 'core/includes/paginator.html' with page_obj=page_obj %}
-        </div>  
-        {% endif %}  
+      <div id="id_tbody" class="card-body table-responsive p-0">
+        {% include 'products/includes/table_list.html' %}
       </div>
       <!-- /.card-body -->
     </div>
@@ -75,42 +60,42 @@
         })
       })
     })
-  const initModal = function(res) {
-    $("#modal").html(res)
-      $('#addToPurchaseModal').modal('show'); 
-      $("form").on("submit", function(e) {
-        e.preventDefault()
-        $.ajax({
-            url: this.getAttribute('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            success: handlePostSubmitSuccess
-        })
-    })
-  }
-  const handlePostSubmitSuccess = function (res) {
-    if ( res.valid === true) {
-      $(document).Toasts('create', {
-        title: "{% trans 'Success' %}",
-        body: res.title,
-        autohide: true,
-        delay: 3000,
-        class: "bg-success"
-      });
-      $('#addToPurchaseModal').modal('toggle');
-    } else {
+    const initModal = function(res) {
       $("#modal").html(res)
-      $("#addToPurchaseModal").modal('show');
-      initModal()
+        $('#addToPurchaseModal').modal('show'); 
+        $("form").on("submit", function(e) {
+          e.preventDefault()
+          $.ajax({
+              url: this.getAttribute('action'),
+              type: 'POST',
+              data: $(this).serialize(),
+              success: handlePostSubmitSuccess
+          })
+      })
     }
-  }
+    const handlePostSubmitSuccess = function (res) {
+      if ( res.valid === true) {
+        $(document).Toasts('create', {
+          title: "{% trans 'Success' %}",
+          body: res.title,
+          autohide: true,
+          delay: 3000,
+          class: "bg-success"
+        });
+        $('#addToPurchaseModal').modal('toggle');
+      } else {
+        $("#modal").html(res)
+        $("#addToPurchaseModal").modal('show');
+        initModal()
+      }
+    }
 
     document.querySelector("#id_search").addEventListener('keyup', function(e) {
       $.ajax({
         type: "GET",
         url: "{% url 'products:product-search' %}" + "?q=" + e.target.value,
         success: function(res) {
-          console.log(res)
+          document.querySelector("#id_tbody").innerHTML = res
         },
         error: function(err) {
           console.log(err)

@@ -8,6 +8,7 @@ from django.views.generic import ListView
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.template.loader import render_to_string
+from django.core.paginator import Paginator
 from wagtail.admin.modal_workflow import render_modal_workflow
 
 from assistant.orders.models import LineItem, Order
@@ -167,26 +168,48 @@ def receive_product_stock(
 
 class ProductListView(ListView):
     template_name = "products/list.html"
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('-created_at')
     context_object_name = "products"
-    paginate_by = 100
+    paginate_by = 10
 
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related("variants")
+        query = self.request.GET.get('q', None)
+        if query:
+            qs = qs.filter(
+                Q(metadata__shopify_id__startswith=query)
+                | Q(variants__metadata__shopify_id__startswith=query)
+                | Q(title__startswith=query)
+            ).order_by('-created_at')
         return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'q': self.request.GET.get('q', None)})
+        return context
 
 
 def product_search(request: HttpRequest) -> HttpResponse:
     query = request.GET.get('q', None)
-    qs = Product.objects.none()
+    page = request.GET.get('page', None)
+    qs = Product.objects.all()
     if query:
         qs = Product.objects.filter(
             Q(metadata__shopify_id__startswith=query)
             | Q(variants__metadata__shopify_id__startswith=query)
             | Q(title__startswith=query)
-        )
-    context = {'products': qs}
-    return render(request, "core/search_dropdown.html", context)
+        ).order_by('-created_at')
+    paginator = Paginator(qs, 10)
+    if page:
+        page_obj = paginator.page(page)
+    else:
+        page_obj = paginator.page(1)
+    context = {
+        'products': page_obj.object_list,
+        'page_obj': page_obj,
+        'q': query,
+    }
+    return render(request, "products/includes/table_list.html", context)
 
 
 def product_add_to_purchase(
